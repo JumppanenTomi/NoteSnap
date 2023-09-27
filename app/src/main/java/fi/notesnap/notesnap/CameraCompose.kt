@@ -46,7 +46,8 @@ fun CameraCompose(
     LaunchedEffect(key1 = true) {
         launcher.launch(
             arrayOf(
-                Manifest.permission.CAMERA
+                Manifest.permission.CAMERA,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
             )
         )
     }
