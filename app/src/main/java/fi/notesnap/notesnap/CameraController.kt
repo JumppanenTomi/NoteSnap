@@ -10,6 +10,7 @@ import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import fi.notesnap.notesnap.machineLearning.TextRecognizer
 import kotlinx.coroutines.launch
 
 class CameraController(
@@ -43,7 +44,8 @@ class CameraController(
             override fun onCaptureSuccess(image: ImageProxy) {
                 super.onCaptureSuccess(image)
                 owner.lifecycleScope.launch {
-                    TODO("Not yet implemented")
+                    val textRecognizer = TextRecognizer(this@launch)
+                    textRecognizer.analyze(image)
                 }
             }
 
