@@ -51,15 +51,19 @@ android {
 }
 
 dependencies {
-    val MLKitVersion = "16.0.0"
+    val textRecognition = "16.0.0"
+    val imageLabeling = "17.0.7"
     val cameraXVersion = "1.2.3"
     val activityVersion = "1.7.2"
     val retrofitVersion = "2.9.0"
     val roomVersion = "2.5.2"
     val navVersion = "2.7.3"
 
-    //ML kit
-    implementation("com.google.mlkit:text-recognition:$MLKitVersion")
+    //Text-recognition
+    implementation("com.google.mlkit:text-recognition:$textRecognition")
+
+    //image-labeling
+    implementation("com.google.mlkit:image-labeling:$imageLabeling")
 
     //cameraX
     implementation("androidx.camera:camera-camera2:$cameraXVersion")
