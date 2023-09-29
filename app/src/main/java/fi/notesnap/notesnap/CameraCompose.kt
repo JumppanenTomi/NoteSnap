@@ -47,7 +47,7 @@ fun CameraCompose(
         launcher.launch(
             arrayOf(
                 Manifest.permission.CAMERA,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
             )
         )
     }
