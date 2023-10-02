@@ -103,4 +103,12 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+
+    implementation ("androidx.compose.ui:ui:1.5.1")
+    implementation ("androidx.compose.material:material:1.5.1")
+    implementation ("androidx.compose.ui:ui-tooling:1.5.1")
+    implementation ("androidx.lifecycle:lifecycle-livedata-compose:1.0.0-alpha07")
+
+
+
 }
