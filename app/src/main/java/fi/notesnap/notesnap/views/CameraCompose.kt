@@ -1,4 +1,4 @@
-package fi.notesnap.notesnap
+package fi.notesnap.notesnap.views
 
 import android.Manifest
 import android.content.Context
@@ -20,12 +20,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import androidx.navigation.NavController
+import fi.notesnap.notesnap.CameraController
 import fi.notesnap.notesnap.CameraUtilities.REQUIRED_PERMISSIONS
 
 @Composable
 fun CameraCompose(
     context: Context,
     cameraController: CameraController,
+    navController: NavController,
     onCaptureClick: () -> Unit,
 ) {
     var hasCamPermission by remember {
@@ -35,8 +38,6 @@ fun CameraCompose(
                         PackageManager.PERMISSION_GRANTED
             })
     }
-
-
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions(),
         onResult = { granted ->
@@ -63,7 +64,10 @@ fun CameraCompose(
         modifier = Modifier.fillMaxSize(), Arrangement.Bottom, Alignment.CenterHorizontally
     ) {
         Button(
-            onClick = onCaptureClick
+            onClick = {
+                onCaptureClick
+                navController.popBackStack() // TODO this is not correct way
+            }
         ) {
             Text(text = "Capture")
         }

@@ -51,6 +51,9 @@ android {
 }
 
 dependencies {
+    implementation("com.google.mlkit:vision-common:17.3.0")
+    implementation("com.google.mlkit:image-labeling-default-common:17.0.0")
+    implementation("com.google.mlkit:image-labeling-common:18.1.0")
     val textRecognition = "16.0.0"
     val imageLabeling = "17.0.7"
     val cameraXVersion = "1.2.3"
