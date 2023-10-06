@@ -17,4 +17,7 @@ interface FolderDao {
 
     @Query("SELECT * FROM folders WHERE id = :folderId")
     fun getFolderById(folderId: Long): LiveData<Folder?>
+
+    @Query("SELECT COUNT(*) FROM folders")
+    suspend fun getFolderCount(): Int
 }

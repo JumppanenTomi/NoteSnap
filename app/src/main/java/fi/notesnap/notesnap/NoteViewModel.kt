@@ -1,24 +1,23 @@
-    package fi.notesnap.notesnap.entities
+    package fi.notesnap.notesnap
 
 
     import androidx.lifecycle.ViewModel
     import androidx.lifecycle.viewModelScope
-    import fi.notesnap.notesnap.NoteEvent
-    import fi.notesnap.notesnap.NoteState
-    import fi.notesnap.notesnap.daos.FolderDao
     import fi.notesnap.notesnap.daos.NoteDao
+    import fi.notesnap.notesnap.entities.Note
+    import kotlinx.coroutines.Dispatchers
     import kotlinx.coroutines.flow.MutableStateFlow
     import kotlinx.coroutines.flow.update
     import kotlinx.coroutines.launch
+    import kotlinx.coroutines.withContext
 
     class NoteViewModel(
         private val noteDao: NoteDao,
-
-
         ): ViewModel() {
         val state = MutableStateFlow(NoteState())
 
-        fun onEvent(event: NoteEvent) {
+
+        fun onEvent(event: NoteEvent, noteId: Long? = null) {
             when(event){
                 is NoteEvent.SaveNote -> {
                     val title = state.value.title
@@ -32,6 +31,7 @@
                         locked = locked,
                         folderId = folderId
                     )
+
                     viewModelScope.launch {
                         noteDao.insertNote(note)
                     }
@@ -55,6 +55,22 @@
                 is NoteEvent.SetFolderId ->{
                     state.update {
                         it.copy(folderId = event.folderId)
+                    }
+                }
+                is NoteEvent.UpdateState->{
+                    viewModelScope.launch(Dispatchers.IO) {
+                        val note = noteDao.getNoteById(noteId)
+                        println("Note is $note")
+                        withContext(Dispatchers.Main) {
+                            val updatedState = state.value.copy(
+                                title = note.title,
+                                content = note.content,
+                                locked = note.locked,
+                                folderId = note.folderId
+                            )
+                            state.value = updatedState
+                            println("State is ${state.value}")
+                        }
                     }
                 }
             }

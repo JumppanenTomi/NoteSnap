@@ -25,19 +25,23 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import fi.notesnap.notesnap.NoteEvent
 import fi.notesnap.notesnap.NoteState
-import fi.notesnap.notesnap.entities.NoteViewModel
-import kotlin.reflect.KFunction2
+import fi.notesnap.notesnap.NoteViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 
 fun NoteView(
+    id: Long,
     state : NoteState,
     navController: NavController,
-    onEvent: (NoteEvent) -> Unit) {
+    onEvent: (NoteEvent) -> Unit,
+    viewModel :NoteViewModel) {
     val context = LocalContext.current
     val kController = LocalSoftwareKeyboardController.current
+    println("id $id")
+    val event = NoteEvent.UpdateState(id)
+    viewModel.onEvent(event)
 
     Scaffold (
        topBar = {
@@ -73,10 +77,11 @@ fun NoteView(
        },
        content = {innerPadding ->
            Column(Modifier.padding(innerPadding)){
-               var title by remember { mutableStateOf("Title") }
+               var title by remember { mutableStateOf("") }
                var content by remember {
-                   mutableStateOf("Note it")
+                   mutableStateOf("")
                }
+
                TextField(
                    modifier = Modifier.fillMaxWidth(),
                    textStyle = TextStyle(
@@ -85,25 +90,21 @@ fun NoteView(
                    ),
                    keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
                    maxLines = 1,
-                   value = title,
+                   value = state.title,
                    onValueChange = {
-                       title = it
-                       state.title = it
-
-                       //onEvent(NoteEvent.SetTitle(it))
+                       title = state.title
+                       onEvent(NoteEvent.SetTitle(it))
                    },
                    label = { Text("Title") }
                )
                TextField(
                    modifier = Modifier.fillMaxWidth(),
-                   value = content,
+                   value = state.content,
                    onValueChange = {
                        content = it
-                       state.content = it
-                       //onEvent(NoteEvent.SetContent(it))
-                                   },
+                       onEvent(NoteEvent.SetContent(it)) },
 
-                   label = { Text("...") }
+                   label = { Text("Note") }
                )
            }
        },

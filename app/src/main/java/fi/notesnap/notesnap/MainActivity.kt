@@ -14,9 +14,8 @@ import fi.notesnap.notesnap.ui.theme.NoteSnapTheme
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.room.Room
-import fi.notesnap.notesnap.entities.NoteViewModel
 import fi.notesnap.notesnap.views.CameraCompose
-import fi.notesnap.notesnap.views.NoteListView
+import fi.notesnap.notesnap.views.FolderView
 import fi.notesnap.notesnap.views.NoteView
 
 class MainActivity : ComponentActivity() {
@@ -29,11 +28,21 @@ class MainActivity : ComponentActivity() {
         ).build()
 
     }
-    private val noteViewModel by viewModels<NoteViewModel>(
+
+    private val folderViewModel by viewModels<FolderViewModel>(
         factoryProducer = {
             object: ViewModelProvider.Factory{
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return NoteViewModel(db.noteDao()) as T
+                    return FolderViewModel(db.noteDao(), 1) as T
+                }
+            }
+        }
+    )
+    val noteViewModel by viewModels<NoteViewModel>(
+        factoryProducer = {
+            object: ViewModelProvider.Factory{
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return  NoteViewModel(db.noteDao()) as T
                 }
             }
         }
@@ -43,13 +52,26 @@ class MainActivity : ComponentActivity() {
         setContent {
             NoteSnapTheme {
                 val navController = rememberNavController()
-                val state by noteViewModel.state.collectAsState()
+                val folderState by folderViewModel.state.collectAsState()
 
                 NavHost(navController, startDestination = "list"){
-                    composable("list") { NoteListView(navController = navController) }
-                    composable("note") { NoteView(state = state, navController = navController,
-                        onEvent = noteViewModel::onEvent) }
-                    composable("camera") { NavBackStackEntry ->
+                    composable("list") { FolderView(state = folderState, navController = navController, folderDao = db.folderDao()) }
+                    composable("note/{id}") {NavBackStackEntry ->
+                        val noteIdString = NavBackStackEntry.arguments?.getString("id")
+                        val noteId = noteIdString?.toLongOrNull()
+                        println("note ID is $noteId")
+
+                        val noteState by noteViewModel.state.collectAsState()
+
+                        NavBackStackEntry.arguments?.let {
+                            if (noteId != null) {
+                                NoteView(
+                                    noteId , state = noteState, navController = navController,
+                                    onEvent = noteViewModel::onEvent, viewModel = noteViewModel)
+                            }
+                        }
+                    }
+                    composable("camera") { navBackStackEntry ->
                         CameraCompose(this@MainActivity, cameraController = cameraController,
                             navController = navController) {
                             if (allPermissionsGranted(this@MainActivity)) {
@@ -61,4 +83,5 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
 }
