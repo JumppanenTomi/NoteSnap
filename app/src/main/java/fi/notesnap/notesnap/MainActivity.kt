@@ -23,10 +23,7 @@ import fi.notesnap.notesnap.views.NoteView
 
 class MainActivity : ComponentActivity() {
     private val db by lazy {
-        Room.databaseBuilder(
-            applicationContext, AppDatabase::class.java, "notes_nap.db"
-        ).build()
-
+        Room.databaseBuilder(applicationContext, AppDatabase::class.java, "notes_nap.db").build()
     }
     private val noteViewModel by viewModels<NoteViewModel>(factoryProducer = {
         object : ViewModelProvider.Factory {
@@ -40,15 +37,16 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             NoteSnapTheme {
-                var detectedText: String by remember { mutableStateOf("No text detected yet..") }
+                var detectedText: String by remember { mutableStateOf("") }
+                val navController = rememberNavController()
 
                 fun onTextUpdated(updatedText: String) {
                     detectedText = updatedText
+                    navController.popBackStack()
                 }
 
                 var cameraController: CameraController =
                     CameraController(this, this, onDetectedTextUpdate = ::onTextUpdated)
-                val navController = rememberNavController()
                 val state by noteViewModel.state.collectAsState()
 
                 NavHost(navController, startDestination = "list") {

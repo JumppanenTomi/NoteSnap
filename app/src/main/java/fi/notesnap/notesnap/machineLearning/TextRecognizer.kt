@@ -18,13 +18,13 @@ class TextRecognizer(
 
     @SuppressLint("UnsafeOptInUsageError")
     override fun analyze(image: ImageProxy) {
-        // Convert the ImageProxy to an InputImage for text recognition
         val inputImage = InputImage.fromMediaImage(image.image!!, image.imageInfo.rotationDegrees)
 
-        // Launch a coroutine to perform text recognition asynchronously
+        //TODO: Make check multiple times and then compare that results are same. And end only when over 50% of results are same
         coroutineScope.launch {
             recognizer.process(inputImage)
                 .addOnSuccessListener { result ->
+                    Log.d("QQQ", result.text)
                     onDetectedTextUpdate(result.text)
                     image.close()
                 }
