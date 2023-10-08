@@ -20,7 +20,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import androidx.navigation.NavController
 import fi.notesnap.notesnap.CameraController
 import fi.notesnap.notesnap.CameraUtilities.REQUIRED_PERMISSIONS
 
@@ -28,9 +27,8 @@ import fi.notesnap.notesnap.CameraUtilities.REQUIRED_PERMISSIONS
 fun CameraCompose(
     context: Context,
     cameraController: CameraController,
-    navController: NavController,
-    onCaptureClick: () -> Unit,
 ) {
+
     var hasCamPermission by remember {
         mutableStateOf(
             REQUIRED_PERMISSIONS.all {
@@ -65,8 +63,7 @@ fun CameraCompose(
     ) {
         Button(
             onClick = {
-                onCaptureClick
-                navController.popBackStack() // TODO this is not correct way
+                cameraController.capturePhoto()
             }
         ) {
             Text(text = "Capture")

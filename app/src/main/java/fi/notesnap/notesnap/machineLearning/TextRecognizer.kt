@@ -10,7 +10,10 @@ import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-class TextRecognizer(private val coroutineScope: CoroutineScope) : ImageAnalysis.Analyzer {
+class TextRecognizer(
+    private val coroutineScope: CoroutineScope,
+    private val onDetectedTextUpdate: (String) -> Unit
+) : ImageAnalysis.Analyzer {
     private val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
 
     @SuppressLint("UnsafeOptInUsageError")
@@ -22,8 +25,7 @@ class TextRecognizer(private val coroutineScope: CoroutineScope) : ImageAnalysis
         coroutineScope.launch {
             recognizer.process(inputImage)
                 .addOnSuccessListener { result ->
-                    Log.d("QQQ", result.text)
-                    // Close the image proxy after processing
+                    onDetectedTextUpdate(result.text)
                     image.close()
                 }
                 .addOnFailureListener { exception ->

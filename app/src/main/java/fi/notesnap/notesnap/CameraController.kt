@@ -10,13 +10,13 @@ import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import fi.notesnap.notesnap.machineLearning.ImageLabelRecognition
 import fi.notesnap.notesnap.machineLearning.TextRecognizer
 import kotlinx.coroutines.launch
 
 class CameraController(
     private var context: Context,
     private var owner: LifecycleOwner,
+    private var onDetectedTextUpdate: (String) -> Unit,
 ) {
     private var imageCapture: ImageCapture? = null
 
@@ -45,12 +45,12 @@ class CameraController(
             override fun onCaptureSuccess(image: ImageProxy) {
                 super.onCaptureSuccess(image)
                 owner.lifecycleScope.launch {
-                    val textRecognizer = TextRecognizer(this)
+                    val textRecognizer =
+                        TextRecognizer(
+                            coroutineScope = this,
+                            onDetectedTextUpdate = onDetectedTextUpdate
+                        )
                     textRecognizer.analyze(image)
-                }
-                owner.lifecycleScope.launch {
-                    val imageLabelRecognition = ImageLabelRecognition(this)
-                    imageLabelRecognition.analyze(image)
                 }
             }
         })

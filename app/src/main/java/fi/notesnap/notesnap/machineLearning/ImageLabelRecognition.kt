@@ -10,7 +10,9 @@ import com.google.mlkit.vision.label.defaults.ImageLabelerOptions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-class ImageLabelRecognition(private val coroutineScope: CoroutineScope) : ImageAnalysis.Analyzer {
+class ImageLabelRecognition(
+    private val coroutineScope: CoroutineScope
+) : ImageAnalysis.Analyzer {
     val labeler = ImageLabeling.getClient(ImageLabelerOptions.DEFAULT_OPTIONS)
 
     @SuppressLint("UnsafeOptInUsageError")
@@ -26,12 +28,8 @@ class ImageLabelRecognition(private val coroutineScope: CoroutineScope) : ImageA
                         val text = label.text
                         val confidence = label.confidence
                         val index = label.index
-                        Log.d(
-                            "QQQ",
-                            text + confidence.toString() + index.toString()
-                        )
                     }
-                    // Close the image proxy after processing
+
                     image.close()
                 }
                 .addOnFailureListener { exception ->
