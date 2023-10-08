@@ -38,7 +38,7 @@ class MainActivity : ComponentActivity() {
             }
         }
     )
-    val noteViewModel by viewModels<NoteViewModel>(
+    private val noteViewModel by viewModels<NoteViewModel>(
         factoryProducer = {
             object: ViewModelProvider.Factory{
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -53,15 +53,13 @@ class MainActivity : ComponentActivity() {
             NoteSnapTheme {
                 val navController = rememberNavController()
                 val folderState by folderViewModel.state.collectAsState()
+                val noteState by noteViewModel.state.collectAsState()
 
                 NavHost(navController, startDestination = "list"){
                     composable("list") { FolderView(state = folderState, navController = navController, folderDao = db.folderDao()) }
                     composable("note/{id}") {NavBackStackEntry ->
                         val noteIdString = NavBackStackEntry.arguments?.getString("id")
                         val noteId = noteIdString?.toLongOrNull()
-                        println("note ID is $noteId")
-
-                        val noteState by noteViewModel.state.collectAsState()
 
                         NavBackStackEntry.arguments?.let {
                             if (noteId != null) {

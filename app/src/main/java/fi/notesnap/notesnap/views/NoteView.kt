@@ -37,11 +37,15 @@ fun NoteView(
     navController: NavController,
     onEvent: (NoteEvent) -> Unit,
     viewModel :NoteViewModel) {
+
     val context = LocalContext.current
     val kController = LocalSoftwareKeyboardController.current
-    println("id $id")
-    val event = NoteEvent.UpdateState(id)
-    viewModel.onEvent(event)
+
+    if (id != 0.toLong()){
+        val event = NoteEvent.UpdateState(id)
+        viewModel.onEvent(event,id)
+        println("Note id is $id")
+    }
 
     Scaffold (
        topBar = {
@@ -66,7 +70,7 @@ fun NoteView(
                actions = {
                    IconButton(onClick = {
                        state.locked = state.locked == false
-                   println(state.locked)}) {
+                       println(state.locked)}) {
                        Icon(
                            imageVector = Icons.Outlined.Lock,
                            contentDescription = "Localized description"
@@ -77,9 +81,9 @@ fun NoteView(
        },
        content = {innerPadding ->
            Column(Modifier.padding(innerPadding)){
-               var title by remember { mutableStateOf("") }
+               var title by remember { mutableStateOf(" ") }
                var content by remember {
-                   mutableStateOf("")
+                   mutableStateOf(" ")
                }
 
                TextField(

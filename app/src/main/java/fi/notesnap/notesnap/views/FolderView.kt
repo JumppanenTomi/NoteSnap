@@ -90,7 +90,7 @@ import kotlinx.coroutines.withContext
                 actions = {
                     Spacer(modifier = Modifier.weight(1f))
                     IconButton(onClick = {
-                        navController.navigate("note")
+                        navController.navigate("note/0")
                     }) {
                         Icon(Icons.Filled.Create, contentDescription = "Localized description")
                     }

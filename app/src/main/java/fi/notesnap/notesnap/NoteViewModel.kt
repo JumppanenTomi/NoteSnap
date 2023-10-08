@@ -9,13 +9,12 @@
     import kotlinx.coroutines.flow.MutableStateFlow
     import kotlinx.coroutines.flow.update
     import kotlinx.coroutines.launch
-    import kotlinx.coroutines.withContext
 
     class NoteViewModel(
         private val noteDao: NoteDao,
         ): ViewModel() {
-        val state = MutableStateFlow(NoteState())
 
+        val state = MutableStateFlow(NoteState())
 
         fun onEvent(event: NoteEvent, noteId: Long? = null) {
             when(event){
@@ -29,7 +28,7 @@
                         title = title,
                         content = content,
                         locked = locked,
-                        folderId = folderId
+                        folderId = 1
                     )
 
                     viewModelScope.launch {
@@ -58,21 +57,29 @@
                     }
                 }
                 is NoteEvent.UpdateState->{
-                    viewModelScope.launch(Dispatchers.IO) {
-                        val note = noteDao.getNoteById(noteId)
-                        println("Note is $note")
-                        withContext(Dispatchers.Main) {
+                    println("NoteEvent.UpdateState block is executed")
+                    println("note ID is $noteId")
+
+                    viewModelScope.launch(Dispatchers.IO)
+                    {
+                        val note = ( noteDao.getNoteById(noteId))
+                        if (note!= null) {
                             val updatedState = state.value.copy(
                                 title = note.title,
-                                content = note.content,
-                                locked = note.locked,
-                                folderId = note.folderId
+                                content = note!!.content,
+                                locked = note!!.locked,
+                                folderId = note!!.folderId
                             )
+                            println("Note ID is $noteId")
+                            println("Note is $note")
                             state.value = updatedState
                             println("State is ${state.value}")
                         }
+                        else{
+                            println("Note is Null")
+                        }
+                    }
                     }
                 }
             }
         }
-    }
