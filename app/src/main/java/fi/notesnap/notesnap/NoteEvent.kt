@@ -7,4 +7,5 @@ interface NoteEvent {
     data class SetLocked(val locked: Boolean) : NoteEvent
     data class SetFolderId (val folderId: Long) : NoteEvent
     data class UpdateState(val noteId: Long) : NoteEvent
+    object EmptyState:NoteEvent
 }

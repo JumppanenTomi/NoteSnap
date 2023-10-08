@@ -53,7 +53,6 @@ class MainActivity : ComponentActivity() {
             NoteSnapTheme {
                 val navController = rememberNavController()
                 val folderState by folderViewModel.state.collectAsState()
-                val noteState by noteViewModel.state.collectAsState()
 
                 NavHost(navController, startDestination = "list"){
                     composable("list") { FolderView(state = folderState, navController = navController, folderDao = db.folderDao()) }
@@ -64,7 +63,7 @@ class MainActivity : ComponentActivity() {
                         NavBackStackEntry.arguments?.let {
                             if (noteId != null) {
                                 NoteView(
-                                    noteId , state = noteState, navController = navController,
+                                    noteId , navController = navController,
                                     onEvent = noteViewModel::onEvent, viewModel = noteViewModel)
                             }
                         }

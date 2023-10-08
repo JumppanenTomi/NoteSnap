@@ -14,7 +14,7 @@
         private val noteDao: NoteDao,
         ): ViewModel() {
 
-        val state = MutableStateFlow(NoteState())
+        var state = MutableStateFlow(NoteState())
 
         fun onEvent(event: NoteEvent, noteId: Long? = null) {
             when(event){
@@ -30,9 +30,8 @@
                         locked = locked,
                         folderId = 1
                     )
-
                     viewModelScope.launch {
-                        noteDao.insertNote(note)
+                        noteDao.upsertNote(note)
                     }
 
                 }
@@ -57,8 +56,6 @@
                     }
                 }
                 is NoteEvent.UpdateState->{
-                    println("NoteEvent.UpdateState block is executed")
-                    println("note ID is $noteId")
 
                     viewModelScope.launch(Dispatchers.IO)
                     {
@@ -66,20 +63,30 @@
                         if (note!= null) {
                             val updatedState = state.value.copy(
                                 title = note.title,
-                                content = note!!.content,
-                                locked = note!!.locked,
-                                folderId = note!!.folderId
+                                content = note.content,
+                                locked = note.locked,
+                                folderId = note.folderId
                             )
-                            println("Note ID is $noteId")
-                            println("Note is $note")
+
                             state.value = updatedState
-                            println("State is ${state.value}")
                         }
                         else{
                             println("Note is Null")
                         }
                     }
                     }
+                is NoteEvent.EmptyState->{
+                    val cleanState = state.value.copy(
+                        title = "",
+                        content = "",
+                        locked = false,
+                        folderId = 1
+                    )
+                    state.value = cleanState
+
+                    println("Empty State")
+                    print(state)
+                }
                 }
             }
         }

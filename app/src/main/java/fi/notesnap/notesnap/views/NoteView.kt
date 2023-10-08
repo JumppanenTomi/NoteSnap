@@ -6,9 +6,11 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,9 +25,11 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import fi.notesnap.notesnap.FolderState
 import fi.notesnap.notesnap.NoteEvent
 import fi.notesnap.notesnap.NoteState
 import fi.notesnap.notesnap.NoteViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
@@ -33,18 +37,20 @@ import fi.notesnap.notesnap.NoteViewModel
 
 fun NoteView(
     id: Long,
-    state : NoteState,
     navController: NavController,
     onEvent: (NoteEvent) -> Unit,
     viewModel :NoteViewModel) {
 
     val context = LocalContext.current
     val kController = LocalSoftwareKeyboardController.current
+    val state by viewModel.state.collectAsState()
 
     if (id != 0.toLong()){
         val event = NoteEvent.UpdateState(id)
         viewModel.onEvent(event,id)
         println("Note id is $id")
+    }else{
+        onEvent(NoteEvent.EmptyState)
     }
 
     Scaffold (
