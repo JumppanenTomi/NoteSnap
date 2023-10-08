@@ -10,20 +10,22 @@ import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-class TextRecognizer(private val coroutineScope: CoroutineScope) : ImageAnalysis.Analyzer {
+class TextRecognizer(
+    private val coroutineScope: CoroutineScope,
+    private val onDetectedTextUpdate: (String) -> Unit
+) : ImageAnalysis.Analyzer {
     private val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
 
     @SuppressLint("UnsafeOptInUsageError")
     override fun analyze(image: ImageProxy) {
-        // Convert the ImageProxy to an InputImage for text recognition
         val inputImage = InputImage.fromMediaImage(image.image!!, image.imageInfo.rotationDegrees)
 
-        // Launch a coroutine to perform text recognition asynchronously
+        //TODO: Make check multiple times and then compare that results are same. And end only when over 50% of results are same
         coroutineScope.launch {
             recognizer.process(inputImage)
                 .addOnSuccessListener { result ->
                     Log.d("QQQ", result.text)
-                    // Close the image proxy after processing
+                    onDetectedTextUpdate(result.text)
                     image.close()
                 }
                 .addOnFailureListener { exception ->
