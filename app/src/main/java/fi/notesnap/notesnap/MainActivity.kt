@@ -176,14 +176,27 @@ class MainActivity : ComponentActivity() {
                                     modifier = Modifier.fillMaxHeight()
                                 ) {
                                     val bottomSheetNavController = rememberNavController()
-                                    var cameraText by remember {
-                                        mutableStateOf("Not yet")
+                                    var cameraTitle by remember {
+                                        mutableStateOf("")
+                                    }
+                                    var cameraContent by remember {
+                                        mutableStateOf("")
                                     }
 
-                                    fun onTextChange(text: String) {
-                                        scope.launch { sheetState.partialExpand() }
-                                        cameraText = text
-                                        bottomSheetNavController.navigate("addNote")
+                                    fun onContentChange(text: String) {
+                                        cameraContent = text
+                                        if (cameraContent != "" && cameraTitle != "") {
+                                            scope.launch { sheetState.partialExpand() }
+                                            bottomSheetNavController.navigate("addNote")
+                                        }
+                                    }
+
+                                    fun onTitleChange(text: String) {
+                                        cameraTitle = text
+                                        if (cameraContent != "" && cameraTitle != "") {
+                                            scope.launch { sheetState.partialExpand() }
+                                            bottomSheetNavController.navigate("addNote")
+                                        }
                                     }
 
                                     NavHost(
@@ -264,8 +277,8 @@ class MainActivity : ComponentActivity() {
                                         }
                                         composable("addNote") {
                                             AddNoteForm(
-                                                "title",
-                                                cameraText,
+                                                cameraTitle,
+                                                cameraContent,
                                                 noteViewModel::onEvent,
                                                 noteViewModel
                                             )
@@ -278,7 +291,8 @@ class MainActivity : ComponentActivity() {
                                             CameraCompose(
                                                 context = this@MainActivity,
                                                 lifecycleOwner = this@MainActivity,
-                                                onDetectedTextUpdate = ::onTextChange
+                                                onDetectedTitleUpdate = ::onTitleChange,
+                                                onDetectedContentUpdate = ::onContentChange
                                             )
                                         }
                                     }
@@ -322,7 +336,8 @@ class MainActivity : ComponentActivity() {
                                 label = { Text("Notes") },
                                 selected = selectedItem == "notes",
                                 onClick = {
-                                    selectedItem = "noteList"; navController.navigate("noteList")
+                                    selectedItem =
+                                        "noteList"; navController.navigate("noteList")
                                 }
                             )
                             NavigationBarItem(
@@ -335,7 +350,8 @@ class MainActivity : ComponentActivity() {
                                 label = { Text("Settings") },
                                 selected = selectedItem == "settings",
                                 onClick = {
-                                    selectedItem = "settings"; navController.navigate("settings")
+                                    selectedItem =
+                                        "settings"; navController.navigate("settings")
                                 }
                             )
                         }

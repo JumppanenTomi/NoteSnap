@@ -19,7 +19,6 @@ class TextRecognizer(
 
         //TODO: Make check multiple times and then compare that results are same. And end only when over 50% of results are same
         recognizer.process(inputImage)
-        recognizer.process(inputImage)
             .addOnSuccessListener { result ->
                 val detectedText = result.textBlocks.joinToString(separator = "\n") { textBlock ->
                     textBlock.text

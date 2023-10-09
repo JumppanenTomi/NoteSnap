@@ -11,11 +11,13 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
+import fi.notesnap.notesnap.machineLearning.ContextRecognizer
 import fi.notesnap.notesnap.machineLearning.TextRecognizer
 
 class CameraController(
     context: Context,
-    onDetectedTextUpdate: (String) -> Unit,
+    onDetectedTitleUpdate: (String) -> Unit,
+    onDetectedContentUpdate: (String) -> Unit,
 ) {
     private var imageCapture: ImageCapture? = null
 
@@ -23,7 +25,11 @@ class CameraController(
 
     private val textRecognizer =
         TextRecognizer(
-            onDetectedTextUpdate = onDetectedTextUpdate
+            onDetectedTextUpdate = onDetectedContentUpdate
+        )
+    private val contextRecognizer =
+        ContextRecognizer(
+            onDetectedTextUpdate = onDetectedTitleUpdate
         )
 
     fun startPreviewView(
@@ -70,6 +76,7 @@ class CameraController(
                     try {
                         d("CameraController", "Starting text recognition")
                         textRecognizer.analyze(image)
+                        contextRecognizer.analyze(image)
                     } catch (e: Exception) {
                         e("CameraController", "Error during text recognition: ${e.message}")
                     } finally {
