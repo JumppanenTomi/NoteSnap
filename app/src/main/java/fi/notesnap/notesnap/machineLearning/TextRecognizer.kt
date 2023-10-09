@@ -7,14 +7,9 @@ import androidx.camera.core.ImageProxy
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-import kotlin.reflect.KFunction0
 
 class TextRecognizer(
-    private val coroutineScope: CoroutineScope,
     private val onDetectedTextUpdate: (String) -> Unit,
-    private val resetCamera: KFunction0<Unit>
 ) : ImageAnalysis.Analyzer {
     private val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
 
@@ -23,21 +18,26 @@ class TextRecognizer(
         val inputImage = InputImage.fromMediaImage(image.image!!, image.imageInfo.rotationDegrees)
 
         //TODO: Make check multiple times and then compare that results are same. And end only when over 50% of results are same
-        coroutineScope.launch {
-            recognizer.process(inputImage)
-                .addOnSuccessListener { result ->
-                    Log.d("QQQ", result.text)
-                    onDetectedTextUpdate(result.text)
-                    resetCamera
-                    image.close()
+        recognizer.process(inputImage)
+        recognizer.process(inputImage)
+            .addOnSuccessListener { result ->
+                val detectedText = result.textBlocks.joinToString(separator = "\n") { textBlock ->
+                    textBlock.text
                 }
-                .addOnFailureListener { exception ->
-                    // Handle text recognition failure
-                    Log.e("TextAnalyzer", "Text recognition failed", exception)
-                    // Close the image proxy after processing
-                    resetCamera
-                    image.close()
-                }
-        }
+                Log.d("QQQ", result.text)
+                onDetectedTextUpdate(detectedText)
+            }
+            .addOnFailureListener { exception ->
+                Log.e(
+                    "TextAnalyzer",
+                    "Text recognition failed with exception: ${exception.message}",
+                    exception
+                )
+                onDetectedTextUpdate("")
+            }
+            .addOnCompleteListener {
+                image.close()
+            }
+
     }
 }

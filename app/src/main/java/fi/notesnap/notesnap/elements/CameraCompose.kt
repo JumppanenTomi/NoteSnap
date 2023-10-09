@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.camera.view.PreviewView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -20,7 +21,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,8 +38,7 @@ fun CameraCompose(
     lifecycleOwner: LifecycleOwner,
     onDetectedTextUpdate: (String) -> Unit
 ) {
-    val scope = rememberCoroutineScope()
-    var cameraController = CameraController(context, lifecycleOwner, onDetectedTextUpdate, scope)
+    var cameraController = CameraController(context, onDetectedTextUpdate)
     var loading by remember { mutableStateOf(false) }
 
     //TODO: Move permission check to CameraUtilities
@@ -68,11 +67,22 @@ fun CameraCompose(
         Column(modifier = Modifier.fillMaxSize()) {
             Log.d("DEBUG", "start preview")
             if (hasCamPermission.value) {
-                val preview = cameraController.startPreviewView()
+                var previewView by remember { mutableStateOf(PreviewView(context)) }
+
+                fun updatePreviewView(updatedPreviewView: PreviewView) {
+                    previewView = updatedPreviewView
+                }
+
+                cameraController.startPreviewView(
+                    previewView,
+                    ::updatePreviewView,
+                    context,
+                    lifecycleOwner
+                )
 
                 AndroidView(
                     modifier = Modifier.fillMaxSize(),
-                    factory = { preview }
+                    factory = { previewView }
                 )
             }
         }
@@ -90,7 +100,7 @@ fun CameraCompose(
                         if (hasCamPermission.value) {
                             loading = true
                             Log.d("DEBUG", "Camera has permission")
-                            cameraController.capturePhoto()
+                            cameraController.capturePhoto(context)
                         } else {
                             Log.d("DEBUG", "No camera permission")
                             //TODO: add snackbar aka Toast here.
