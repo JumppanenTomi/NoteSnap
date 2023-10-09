@@ -69,6 +69,7 @@ dependencies {
     implementation("com.google.mlkit:image-labeling:$imageLabeling")
 
     //cameraX
+    implementation("androidx.camera:camera-core:${cameraXVersion}")
     implementation("androidx.camera:camera-camera2:$cameraXVersion")
     implementation("androidx.camera:camera-lifecycle:$cameraXVersion")
     implementation("androidx.camera:camera-view:$cameraXVersion")

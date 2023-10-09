@@ -157,7 +157,7 @@ class MainActivity : ComponentActivity() {
                                                 navController = navController,
                                                 onEvent = noteViewModel::onEvent,
                                                 viewModel = noteViewModel,
-                                                this@MainActivity
+                                                lifecycleOwner = this@MainActivity
                                             )
                                         }
                                     }

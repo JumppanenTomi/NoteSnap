@@ -9,10 +9,12 @@ import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlin.reflect.KFunction0
 
 class TextRecognizer(
     private val coroutineScope: CoroutineScope,
-    private val onDetectedTextUpdate: (String) -> Unit
+    private val onDetectedTextUpdate: (String) -> Unit,
+    private val resetCamera: KFunction0<Unit>
 ) : ImageAnalysis.Analyzer {
     private val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
 
@@ -26,12 +28,14 @@ class TextRecognizer(
                 .addOnSuccessListener { result ->
                     Log.d("QQQ", result.text)
                     onDetectedTextUpdate(result.text)
+                    resetCamera
                     image.close()
                 }
                 .addOnFailureListener { exception ->
                     // Handle text recognition failure
                     Log.e("TextAnalyzer", "Text recognition failed", exception)
                     // Close the image proxy after processing
+                    resetCamera
                     image.close()
                 }
         }
