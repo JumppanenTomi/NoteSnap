@@ -52,16 +52,14 @@ import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
 import fi.notesnap.notesnap.elements.AddFolderForm
 import fi.notesnap.notesnap.elements.AddNoteForm
+import fi.notesnap.notesnap.elements.CameraCompose
 import fi.notesnap.notesnap.ui.theme.NoteSnapTheme
-import fi.notesnap.notesnap.views.CameraCompose
-import fi.notesnap.notesnap.views.FolderView
+import fi.notesnap.notesnap.views.NoteListingView
 import fi.notesnap.notesnap.views.NoteView
 import fi.notesnap.notesnap.views.SettingsView
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
-    private val lifecycleOwner = this
-
     private val db by lazy {
         Room.databaseBuilder(
             applicationContext,
@@ -133,11 +131,15 @@ class MainActivity : ComponentActivity() {
                         Column(Modifier.padding(innerPadding)) {
                             NavHost(
                                 navController,
-                                startDestination = "list"
+                                startDestination = "folderList"
                             ) {
-                                composable("list") {
+                                composable("folderList") {
                                     toggleFloatingButton(true)
-                                    FolderView(
+                                    Text(text = "This is folder listing")
+                                }
+                                composable("noteList") {
+                                    toggleFloatingButton(true)
+                                    NoteListingView(
                                         state = folderState,
                                         navController = navController,
                                         folderDao = db.folderDao()
@@ -155,7 +157,7 @@ class MainActivity : ComponentActivity() {
                                                 navController = navController,
                                                 onEvent = noteViewModel::onEvent,
                                                 viewModel = noteViewModel,
-                                                lifecycleOwner
+                                                this@MainActivity
                                             )
                                         }
                                     }
@@ -181,7 +183,7 @@ class MainActivity : ComponentActivity() {
                                     fun onTextChange(text: String) {
                                         scope.launch { sheetState.partialExpand() }
                                         cameraText = text
-                                        bottomSheetNavController.navigate("addNote/${"title"}/${text}")
+                                        bottomSheetNavController.navigate("addNote")
                                     }
 
                                     NavHost(
@@ -260,10 +262,13 @@ class MainActivity : ComponentActivity() {
                                                 Divider()
                                             }
                                         }
-                                        composable("addNote/{title}/{content}") { result ->
-                                            val title = result.arguments?.getString("title")
-                                            val content = result.arguments?.getString("content")
-                                            AddNoteForm(title, content)
+                                        composable("addNote") {
+                                            AddNoteForm(
+                                                "title",
+                                                cameraText,
+                                                noteViewModel::onEvent,
+                                                noteViewModel
+                                            )
                                         }
                                         composable("addFolder") {
                                             AddFolderForm()
@@ -272,7 +277,7 @@ class MainActivity : ComponentActivity() {
                                             scope.launch { sheetState.expand() }
                                             CameraCompose(
                                                 context = this@MainActivity,
-                                                lifecycleOwner = lifecycleOwner,
+                                                lifecycleOwner = this@MainActivity,
                                                 onDetectedTextUpdate = ::onTextChange
                                             )
                                         }
@@ -284,7 +289,7 @@ class MainActivity : ComponentActivity() {
                     floatingActionButton = {
                         if (showFloatingButton) {
                             FloatingActionButton(onClick = {
-                                navController.navigate("note/0"); showBottomSheet = true
+                                showBottomSheet = true
                             }) {
                                 Icon(Icons.Filled.Add, "Floating action button.")
                             }
@@ -303,7 +308,8 @@ class MainActivity : ComponentActivity() {
                                 label = { Text("Folders") },
                                 selected = selectedItem == "folders",
                                 onClick = {
-                                    selectedItem = "folders"; navController.navigate("list")
+                                    selectedItem =
+                                        "folderList"; navController.navigate("folderList")
                                 }
                             )
                             NavigationBarItem(
@@ -316,7 +322,7 @@ class MainActivity : ComponentActivity() {
                                 label = { Text("Notes") },
                                 selected = selectedItem == "notes",
                                 onClick = {
-                                    selectedItem = "notes"; navController.navigate("notes")
+                                    selectedItem = "noteList"; navController.navigate("noteList")
                                 }
                             )
                             NavigationBarItem(

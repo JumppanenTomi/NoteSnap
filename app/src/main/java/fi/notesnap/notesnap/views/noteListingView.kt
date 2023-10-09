@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @Composable
-fun FolderView(
+fun NoteListingView(
     state: FolderState,
     navController: NavController,
     folderDao: FolderDao,

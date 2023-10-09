@@ -38,6 +38,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import fi.notesnap.notesnap.NoteEvent
 import fi.notesnap.notesnap.NoteViewModel
+import fi.notesnap.notesnap.elements.CameraCompose
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)

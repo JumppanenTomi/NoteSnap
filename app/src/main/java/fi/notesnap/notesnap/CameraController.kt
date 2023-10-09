@@ -34,6 +34,7 @@ class CameraController(
         try {
             cameraProviderFuture.get().bindToLifecycle(owner, camSelector, preview, imageCapture)
         } catch (e: Exception) {
+            Log.d("DEBUG", e.toString())
             e.printStackTrace()
         }
         return previewView
