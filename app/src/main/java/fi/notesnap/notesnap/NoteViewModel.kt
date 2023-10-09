@@ -11,7 +11,8 @@ class NoteViewModel(private val appDatabase: AppDatabase) : ViewModel() {
 
     fun getAllFolders(): LiveData<List<Folder>> = appDatabase.folderDao().getAllFolders()
 
-    fun getNotesByFolder(folderId: Long): LiveData<List<Note>> = appDatabase.noteDao().getNotesByFolder(folderId)
+    fun getNotesByFolder(folderId: Long): LiveData<List<Note>> =
+        appDatabase.noteDao().getNotesByFolder(folderId)
 
     fun createFolder(folderName: String) {
         viewModelScope.launch {
@@ -19,5 +20,4 @@ class NoteViewModel(private val appDatabase: AppDatabase) : ViewModel() {
             appDatabase.folderDao().insertFolder(folder)
         }
     }
-
 }
