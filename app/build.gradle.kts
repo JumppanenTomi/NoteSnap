@@ -51,9 +51,6 @@ android {
 }
 
 dependencies {
-    implementation("com.google.mlkit:vision-common:17.3.0")
-    implementation("com.google.mlkit:image-labeling-default-common:17.0.0")
-    implementation("com.google.mlkit:image-labeling-common:18.1.0")
     val textRecognition = "16.0.0"
     val imageLabeling = "17.0.7"
     val cameraXVersion = "1.2.3"
@@ -61,12 +58,26 @@ dependencies {
     val retrofitVersion = "2.9.0"
     val roomVersion = "2.5.2"
     val navVersion = "2.7.3"
+    val translateVersion = "17.0.1"
+    val languageDetectionVersion = "17.0.4"
+
+
+    //ml kit vision
+    implementation("com.google.mlkit:vision-common:17.3.0")
+
+    //translation
+    implementation("com.google.mlkit:translate:${translateVersion}")
+
+    //language detection
+    implementation("com.google.mlkit:language-id:${languageDetectionVersion}")
 
     //Text-recognition
     implementation("com.google.mlkit:text-recognition:$textRecognition")
 
     //image-labeling
     implementation("com.google.mlkit:image-labeling:$imageLabeling")
+    implementation("com.google.mlkit:image-labeling-default-common:17.0.0")
+    implementation("com.google.mlkit:image-labeling-common:18.1.0")
 
     //cameraX
     implementation("androidx.camera:camera-core:${cameraXVersion}")
@@ -92,6 +103,7 @@ dependencies {
     implementation("androidx.navigation:navigation-fragment-ktx:$navVersion")
     implementation("androidx.navigation:navigation-ui-ktx:$navVersion")
     implementation("androidx.navigation:navigation-compose:$navVersion")
+
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
     implementation("androidx.activity:activity-compose:1.7.2")
