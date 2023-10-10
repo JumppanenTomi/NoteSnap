@@ -53,6 +53,7 @@ import androidx.room.Room
 import fi.notesnap.notesnap.elements.AddFolderForm
 import fi.notesnap.notesnap.elements.AddNoteForm
 import fi.notesnap.notesnap.elements.CameraCompose
+import fi.notesnap.notesnap.elements.FoldersScreen
 import fi.notesnap.notesnap.ui.theme.NoteSnapTheme
 import fi.notesnap.notesnap.views.NoteListingView
 import fi.notesnap.notesnap.views.NoteView
@@ -100,7 +101,7 @@ class MainActivity : ComponentActivity() {
                 var selectedItem by remember { mutableStateOf("") }
                 val scrollBehavior =
                     TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
-
+                var folders by remember { mutableStateOf(listOf<String>()) }
                 val sheetState = rememberModalBottomSheetState()
                 val scope = rememberCoroutineScope()
                 var showBottomSheet by remember { mutableStateOf(false) }
@@ -129,14 +130,20 @@ class MainActivity : ComponentActivity() {
                     },
                     content = { innerPadding ->
                         Column(Modifier.padding(innerPadding)) {
+                            var folders by remember { mutableStateOf(listOf("General")) }
+
                             NavHost(
                                 navController,
                                 startDestination = "folderList"
                             ) {
                                 composable("folderList") {
+                                    FoldersScreen(folders = folders, onFoldersUpdated = { updatedFolders ->
+                                        folders = updatedFolders
+                                    }) // Pass the current folders list to the FoldersScreen
                                     toggleFloatingButton(true)
-                                    Text(text = "This is folder listing")
                                 }
+
+
                                 composable("noteList") {
                                     toggleFloatingButton(true)
                                     NoteListingView(
@@ -271,7 +278,10 @@ class MainActivity : ComponentActivity() {
                                             )
                                         }
                                         composable("addFolder") {
-                                            AddFolderForm()
+                                            AddFolderForm(onAddFolder = { newFolder ->
+                                                folders = folders + newFolder
+                                                // Navigate back or perform other actions after adding the folder
+                                            })
                                         }
                                         composable("addWithCamera") {
                                             scope.launch { sheetState.expand() }
