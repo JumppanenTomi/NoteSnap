@@ -36,9 +36,10 @@ import fi.notesnap.notesnap.CameraUtilities.REQUIRED_PERMISSIONS
 fun CameraCompose(
     context: Context,
     lifecycleOwner: LifecycleOwner,
-    onDetectedTextUpdate: (String) -> Unit
+    onDetectedTitleUpdate: (String) -> Unit,
+    onDetectedContentUpdate: (String) -> Unit
 ) {
-    var cameraController = CameraController(context, onDetectedTextUpdate)
+    var cameraController = CameraController(context, onDetectedTitleUpdate, onDetectedContentUpdate)
     var loading by remember { mutableStateOf(false) }
 
     //TODO: Move permission check to CameraUtilities
