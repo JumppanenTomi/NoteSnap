@@ -33,6 +33,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -41,7 +42,9 @@ import fi.notesnap.notesnap.elements.AddNoteForm
 import fi.notesnap.notesnap.elements.BottomSheetNav
 import fi.notesnap.notesnap.elements.CameraCompose
 import fi.notesnap.notesnap.elements.FoldersScreen
+import fi.notesnap.notesnap.entities.Folder
 import fi.notesnap.notesnap.ui.theme.NoteSnapTheme
+import fi.notesnap.notesnap.viewmodels.FolderViewModel
 import fi.notesnap.notesnap.viewmodels.NoteViewModelV2
 import fi.notesnap.notesnap.views.NoteScreen
 import fi.notesnap.notesnap.views.SettingsView
@@ -92,32 +95,27 @@ class MainActivity : ComponentActivity() {
                     },
                     content = { innerPadding ->
                         Column(Modifier.padding(innerPadding)) {
-                            var folders by remember { mutableStateOf(listOf("General")) }
 
                             NavHost(
                                 navController,
                                 startDestination = "folderList"
                             ) {
                                 composable("folderList") {
+                                    val folderViewModel: FolderViewModel = viewModel()
+
+                                    // Removed the folders and onFoldersUpdated parameters
                                     FoldersScreen(
-                                        folders = folders,
-                                        onFoldersUpdated = { updatedFolders ->
-                                            folders = updatedFolders
-                                        }) // Pass the current folders list to the FoldersScreen
+                                        viewModel = folderViewModel
+                                    )
                                     toggleFloatingButton(true)
                                 }
 
-
                                 composable("noteList") {
                                     toggleFloatingButton(true)
-                                    /*
-                                    NoteListingView(
-                                        state = folderState,
+                                    NoteScreen(
                                         navController = navController,
-                                        folderDao = db.folderDao()
+                                        viewModel = noteViewModelV2
                                     )
-                                    */
-                                    NoteScreen(navController = navController, viewModel = noteViewModelV2)
                                 }
 
                                 composable("settings") {
@@ -125,6 +123,7 @@ class MainActivity : ComponentActivity() {
                                     SettingsView()
                                 }
                             }
+
                             if (showBottomSheet) {
                                 ModalBottomSheet(
                                     onDismissRequest = {
@@ -134,16 +133,12 @@ class MainActivity : ComponentActivity() {
                                     modifier = Modifier.fillMaxHeight()
                                 ) {
                                     val bottomSheetNavController = rememberNavController()
-                                    var cameraTitle by remember {
-                                        mutableStateOf("")
-                                    }
-                                    var cameraContent by remember {
-                                        mutableStateOf("")
-                                    }
+                                    var cameraTitle by remember { mutableStateOf("") }
+                                    var cameraContent by remember { mutableStateOf("") }
 
                                     fun onContentChange(text: String) {
                                         cameraContent = text
-                                        if (cameraContent != "" && cameraTitle != "") {
+                                        if (cameraContent.isNotEmpty() && cameraTitle.isNotEmpty()) {
                                             scope.launch { sheetState.partialExpand() }
                                             bottomSheetNavController.navigate("addNote")
                                         }
@@ -151,7 +146,7 @@ class MainActivity : ComponentActivity() {
 
                                     fun onTitleChange(text: String) {
                                         cameraTitle = text
-                                        if (cameraContent != "" && cameraTitle != "") {
+                                        if (cameraContent.isNotEmpty() && cameraTitle.isNotEmpty()) {
                                             scope.launch { sheetState.partialExpand() }
                                             bottomSheetNavController.navigate("addNote")
                                         }
@@ -159,7 +154,7 @@ class MainActivity : ComponentActivity() {
 
                                     NavHost(
                                         navController = bottomSheetNavController,
-                                        startDestination = "options",
+                                        startDestination = "options"
                                     ) {
                                         composable("options") {
                                             BottomSheetNav(navController = bottomSheetNavController)
@@ -172,9 +167,8 @@ class MainActivity : ComponentActivity() {
                                             )
                                         }
                                         composable("addFolder") {
-                                            AddFolderForm(onAddFolder = { newFolder ->
-                                                folders = folders + newFolder
-                                            })
+                                            val folderViewModel = viewModel<FolderViewModel>()
+                                            AddFolderForm(viewModel = folderViewModel)
                                         }
                                         composable("addWithCamera") {
                                             scope.launch { sheetState.expand() }
