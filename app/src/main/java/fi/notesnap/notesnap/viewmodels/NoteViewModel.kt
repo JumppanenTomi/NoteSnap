@@ -26,6 +26,10 @@ class NoteViewModelV2(application: Application) : AndroidViewModel(application) 
         viewModelScope.launch { noteDao.insertNote(note) }
     }
 
+    fun deleteNote(id: Long) {
+        viewModelScope.launch { noteDao.deleteNoteById(id) }
+    }
+
     fun updateNote(note: Note) {
         viewModelScope.launch { noteDao.updateNote(note) }
     }

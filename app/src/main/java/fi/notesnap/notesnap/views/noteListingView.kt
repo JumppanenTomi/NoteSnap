@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.List
@@ -175,7 +174,14 @@ fun NoteScreen(navController: NavController, viewModel: NoteViewModelV2) {
             onDismissRequest = { showNoteDetails = false },
             modifier = Modifier.fillMaxSize(),
         ) {
-            NoteDetailsView(selectedNote!!, viewModel = viewModel)
+            fun toggleShowNoteDetails(boolean: Boolean) {
+                showNoteDetails = boolean
+            }
+            NoteDetailsView(
+                selectedNote!!,
+                viewModel = viewModel,
+                toggleNoteDetails = ::toggleShowNoteDetails
+            )
         }
     }
 }
