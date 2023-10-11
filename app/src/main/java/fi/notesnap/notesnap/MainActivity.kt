@@ -46,7 +46,9 @@ import fi.notesnap.notesnap.elements.BottomSheetNav
 import fi.notesnap.notesnap.elements.CameraCompose
 import fi.notesnap.notesnap.elements.FoldersScreen
 import fi.notesnap.notesnap.ui.theme.NoteSnapTheme
+import fi.notesnap.notesnap.viewmodels.NoteViewModelV2
 import fi.notesnap.notesnap.views.NoteListingView
+import fi.notesnap.notesnap.views.NoteScreen
 import fi.notesnap.notesnap.views.NoteView
 import fi.notesnap.notesnap.views.SettingsView
 import kotlinx.coroutines.launch
@@ -79,6 +81,8 @@ class MainActivity : ComponentActivity() {
             }
         }
     )
+
+    private val noteViewModelV2:NoteViewModelV2 by viewModels()
 
     @OptIn(ExperimentalMaterial3Api::class)
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "CoroutineCreationDuringComposition")
@@ -140,11 +144,14 @@ class MainActivity : ComponentActivity() {
 
                                 composable("noteList") {
                                     toggleFloatingButton(true)
+                                    /*
                                     NoteListingView(
                                         state = folderState,
                                         navController = navController,
                                         folderDao = db.folderDao()
                                     )
+                                    */
+                                    NoteScreen(navController = navController, viewModel = noteViewModelV2)
                                 }
                                 composable("note/{id}") { navBackStackEntry ->
                                     toggleFloatingButton(true)
@@ -212,7 +219,8 @@ class MainActivity : ComponentActivity() {
                                                 cameraTitle,
                                                 cameraContent,
                                                 noteViewModel::onEvent,
-                                                noteViewModel
+                                                noteViewModel,
+                                                viewModelV2 = noteViewModelV2
                                             )
                                         }
                                         composable("addFolder") {
