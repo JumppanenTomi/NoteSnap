@@ -26,7 +26,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberTopAppBarState
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,12 +33,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.room.Room
 import fi.notesnap.notesnap.elements.AddFolderForm
 import fi.notesnap.notesnap.elements.AddNoteForm
 import fi.notesnap.notesnap.elements.BottomSheetNav
@@ -47,40 +43,11 @@ import fi.notesnap.notesnap.elements.CameraCompose
 import fi.notesnap.notesnap.elements.FoldersScreen
 import fi.notesnap.notesnap.ui.theme.NoteSnapTheme
 import fi.notesnap.notesnap.viewmodels.NoteViewModelV2
-import fi.notesnap.notesnap.views.NoteListingView
 import fi.notesnap.notesnap.views.NoteScreen
-import fi.notesnap.notesnap.views.NoteView
 import fi.notesnap.notesnap.views.SettingsView
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
-    private val db by lazy {
-        Room.databaseBuilder(
-            applicationContext,
-            AppDatabase::class.java,
-            "notes_nap.db"
-        ).build()
-
-    }
-
-    private val folderViewModel by viewModels<FolderViewModel>(
-        factoryProducer = {
-            object : ViewModelProvider.Factory {
-                override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return FolderViewModel(db.noteDao(), 1) as T
-                }
-            }
-        }
-    )
-    private val noteViewModel by viewModels<NoteViewModel>(
-        factoryProducer = {
-            object : ViewModelProvider.Factory {
-                override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return NoteViewModel(db.noteDao()) as T
-                }
-            }
-        }
-    )
 
     private val noteViewModelV2:NoteViewModelV2 by viewModels()
 
@@ -93,7 +60,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             NoteSnapTheme {
                 val navController = rememberNavController()
-                val folderState by folderViewModel.state.collectAsState()
                 var selectedItem by remember { mutableStateOf("") }
                 val scrollBehavior =
                     TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
@@ -153,23 +119,7 @@ class MainActivity : ComponentActivity() {
                                     */
                                     NoteScreen(navController = navController, viewModel = noteViewModelV2)
                                 }
-                                composable("note/{id}") { navBackStackEntry ->
-                                    toggleFloatingButton(true)
-                                    val noteIdString = navBackStackEntry.arguments?.getString("id")
-                                    val noteId = noteIdString?.toLongOrNull()
 
-                                    navBackStackEntry.arguments?.let {
-                                        if (noteId != null) {
-                                            NoteView(
-                                                noteId,
-                                                navController = navController,
-                                                onEvent = noteViewModel::onEvent,
-                                                viewModel = noteViewModel,
-                                                lifecycleOwner = this@MainActivity
-                                            )
-                                        }
-                                    }
-                                }
                                 composable("settings") {
                                     toggleFloatingButton(false)
                                     SettingsView()
@@ -218,8 +168,6 @@ class MainActivity : ComponentActivity() {
                                             AddNoteForm(
                                                 cameraTitle,
                                                 cameraContent,
-                                                noteViewModel::onEvent,
-                                                noteViewModel,
                                                 viewModelV2 = noteViewModelV2
                                             )
                                         }

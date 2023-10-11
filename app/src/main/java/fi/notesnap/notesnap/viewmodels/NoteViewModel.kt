@@ -5,12 +5,16 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import fi.notesnap.notesnap.AppDatabase
+import fi.notesnap.notesnap.NoteState
 import fi.notesnap.notesnap.entities.Note
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 class NoteViewModelV2(application: Application) : AndroidViewModel(application) {
     private val database = AppDatabase.getInstance(application)
     private val noteDao = database.noteDao()
+    var state = MutableStateFlow(NoteState())
+
 
     fun getAllNotes(): LiveData<List<Note>> {
         return noteDao.getAllNotes()

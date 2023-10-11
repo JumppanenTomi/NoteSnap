@@ -39,8 +39,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import fi.notesnap.notesnap.NoteEvent
-import fi.notesnap.notesnap.NoteViewModel
 import fi.notesnap.notesnap.machineLearning.translateString
 import fi.notesnap.notesnap.utilities.languageCodeToNameMap
 import fi.notesnap.notesnap.viewmodels.NoteViewModelV2
@@ -183,8 +181,6 @@ fun FolderList(folders: List<String>, onFoldersUpdated: (List<String>) -> Unit) 
 fun AddNoteForm(
     titleFromCamera: String?,
     contentFromCamera: String?,
-    onEvent: (NoteEvent) -> Unit,
-    viewModel: NoteViewModel,
     viewModelV2: NoteViewModelV2
 ) {
     var title by remember { mutableStateOf(titleFromCamera) }
@@ -220,8 +216,7 @@ fun AddNoteForm(
         translateToCode = languageCode
     }
 
-    val state by viewModel.state.collectAsState()
-    onEvent(NoteEvent.EmptyState)
+    val state by viewModelV2.state.collectAsState()
 
     state.title = title.toString()
     state.content = content.toString()
@@ -248,7 +243,6 @@ fun AddNoteForm(
                 label = { Text(text = "Note title") },
                 onValueChange = { newText ->
                     title = newText
-                    onEvent(NoteEvent.SetTitle(newText))
                 }
             )
             Spacer(Modifier.height(24.dp))
@@ -259,7 +253,6 @@ fun AddNoteForm(
                 value = state.content,
                 onValueChange = { newText ->
                     content = newText
-                    onEvent(NoteEvent.SetContent(newText))
                 },
                 label = { Text("Note") }
             )
