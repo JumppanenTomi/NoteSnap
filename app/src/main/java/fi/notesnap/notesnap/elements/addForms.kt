@@ -41,6 +41,7 @@ import fi.notesnap.notesnap.NoteEvent
 import fi.notesnap.notesnap.NoteViewModel
 import fi.notesnap.notesnap.machineLearning.translateString
 import fi.notesnap.notesnap.utilities.languageCodeToNameMap
+import fi.notesnap.notesnap.viewmodels.NoteViewModelV2
 
 
 // Modify the AddFolderForm to accept a callback function for adding folders
@@ -183,7 +184,8 @@ fun AddNoteForm(
     titleFromCamera: String?,
     contentFromCamera: String?,
     onEvent: (NoteEvent) -> Unit,
-    viewModel: NoteViewModel
+    viewModel: NoteViewModel,
+    viewModelV2: NoteViewModelV2
 ) {
     var title by remember { mutableStateOf(titleFromCamera) }
     var titleReady by remember { mutableStateOf(false) }
@@ -309,7 +311,7 @@ fun AddNoteForm(
                     .fillMaxWidth()
                     .wrapContentHeight(), Arrangement.End
             ) {
-                Button(onClick = { /*TODO*/ }) {
+                Button(onClick = { viewModelV2.insertNote(title!!, content!!) }) {
                     Text(text = "Save")
                 }
             }

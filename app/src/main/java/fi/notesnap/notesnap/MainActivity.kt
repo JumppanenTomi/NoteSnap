@@ -55,7 +55,10 @@ import fi.notesnap.notesnap.elements.AddNoteForm
 import fi.notesnap.notesnap.elements.CameraCompose
 import fi.notesnap.notesnap.elements.FoldersScreen
 import fi.notesnap.notesnap.ui.theme.NoteSnapTheme
+import fi.notesnap.notesnap.viewmodels.NoteViewModelV2
+import fi.notesnap.notesnap.views.NoteDetailsView
 import fi.notesnap.notesnap.views.NoteListingView
+import fi.notesnap.notesnap.views.NoteScreen
 import fi.notesnap.notesnap.views.NoteView
 import fi.notesnap.notesnap.views.SettingsView
 import kotlinx.coroutines.launch
@@ -88,6 +91,9 @@ class MainActivity : ComponentActivity() {
             }
         }
     )
+
+
+    private val noteViewModelV2 : NoteViewModelV2 by viewModels()
 
     @OptIn(ExperimentalMaterial3Api::class)
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "CoroutineCreationDuringComposition")
@@ -140,34 +146,14 @@ class MainActivity : ComponentActivity() {
                                     FoldersScreen(folders = folders, onFoldersUpdated = { updatedFolders ->
                                         folders = updatedFolders
                                     }) // Pass the current folders list to the FoldersScreen
+
                                     toggleFloatingButton(true)
                                 }
 
 
                                 composable("noteList") {
                                     toggleFloatingButton(true)
-                                    NoteListingView(
-                                        state = folderState,
-                                        navController = navController,
-                                        folderDao = db.folderDao()
-                                    )
-                                }
-                                composable("note/{id}") { navBackStackEntry ->
-                                    toggleFloatingButton(true)
-                                    val noteIdString = navBackStackEntry.arguments?.getString("id")
-                                    val noteId = noteIdString?.toLongOrNull()
-
-                                    navBackStackEntry.arguments?.let {
-                                        if (noteId != null) {
-                                            NoteView(
-                                                noteId,
-                                                navController = navController,
-                                                onEvent = noteViewModel::onEvent,
-                                                viewModel = noteViewModel,
-                                                lifecycleOwner = this@MainActivity
-                                            )
-                                        }
-                                    }
+                                    NoteScreen(navController, noteViewModelV2)
                                 }
                                 composable("settings") {
                                     toggleFloatingButton(false)
@@ -287,7 +273,8 @@ class MainActivity : ComponentActivity() {
                                                 cameraTitle,
                                                 cameraContent,
                                                 noteViewModel::onEvent,
-                                                noteViewModel
+                                                noteViewModel,
+                                                noteViewModelV2
                                             )
                                         }
                                         composable("addFolder") {

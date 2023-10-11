@@ -23,15 +23,16 @@
                     val content = state.value.content
                     val locked = state.value.locked
                     val folderId = state.value.folderId
-
+/*
                     val note = Note(
                         title = title,
                         content = content,
                         locked = locked,
                         folderId = 1
                     )
+ */
                     viewModelScope.launch {
-                        noteDao.upsertNote(note)
+                        //noteDao.upsertNote(note)
                     }
 
                 }
@@ -62,10 +63,10 @@
                         val note = ( noteDao.getNoteById(noteId))
                         if (note!= null) {
                             val updatedState = state.value.copy(
-                                title = note.title,
-                                content = note.content,
-                                locked = note.locked,
-                                folderId = note.folderId
+                                //title = note.title,
+                                //content = note.content,
+                                //locked = note.locked,
+                                //folderId = note.folderId
                             )
 
                             state.value = updatedState

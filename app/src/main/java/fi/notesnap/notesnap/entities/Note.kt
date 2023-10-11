@@ -1,5 +1,6 @@
 package fi.notesnap.notesnap.entities
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
@@ -17,5 +18,9 @@ data class Note(
     val title: String,
     val content: String,
     val locked: Boolean,
-    val folderId: Long
+    val folderId: Long?,
+    @ColumnInfo(name = "created_at")
+    val createdAt: Long,
+    @ColumnInfo(name = "updated_at")
+    val updatedAt: Long
 )
