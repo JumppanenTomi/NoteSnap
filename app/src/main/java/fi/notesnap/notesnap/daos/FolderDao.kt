@@ -2,10 +2,11 @@ package fi.notesnap.notesnap.daos
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Upsert
+import androidx.room.Update
 import fi.notesnap.notesnap.entities.Folder
 
 @Dao
@@ -15,6 +16,12 @@ interface FolderDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertFolder(folder: Folder)
+
+    @Update
+    suspend fun updateFolder(folder: Folder)
+
+    @Delete
+    suspend fun deleteFolder(folder: Folder)
 
     @Query("SELECT * FROM folders WHERE id = :folderId")
     fun getFolderById(folderId: Long): LiveData<Folder?>

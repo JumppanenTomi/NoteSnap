@@ -2,35 +2,14 @@ package fi.notesnap.notesnap.elements
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,14 +18,21 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import fi.notesnap.notesnap.entities.Folder
 import fi.notesnap.notesnap.machineLearning.translateString
 import fi.notesnap.notesnap.utilities.languageCodeToNameMap
+import fi.notesnap.notesnap.viewmodels.FolderViewModel
 import fi.notesnap.notesnap.viewmodels.NoteViewModelV2
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.runtime.livedata.observeAsState
 
 
-// Modify the AddFolderForm to accept a callback function for adding folders
 @Composable
-fun AddFolderForm(onAddFolder: (String) -> Unit) {
+fun AddFolderForm(viewModel: FolderViewModel) {
     var text by remember { mutableStateOf("") }
 
     Column(
@@ -69,8 +55,8 @@ fun AddFolderForm(onAddFolder: (String) -> Unit) {
         Spacer(Modifier.height(24.dp))
         Row(Modifier.fillMaxWidth(), Arrangement.End) {
             Button(onClick = {
-                onAddFolder(text)
-                text = "" // reset the text field after adding
+                viewModel.insertFolder(text)
+                text = ""
             }) {
                 Text(text = "Save")
             }
@@ -80,12 +66,13 @@ fun AddFolderForm(onAddFolder: (String) -> Unit) {
 
 @Composable
 fun FolderItem(
-    folderName: String,
+    folder: Folder,
+    viewModel: FolderViewModel,
     onEditCompleted: (newName: String) -> Unit,
     onDelete: () -> Unit
 ) {
     var isEditing by remember { mutableStateOf(false) }
-    var editingText by remember { mutableStateOf(folderName) }
+    var editingText by remember { mutableStateOf(folder.name) }
 
     Row(
         modifier = Modifier
@@ -96,7 +83,6 @@ fun FolderItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (isEditing) {
-            // Show TextField when editing
             TextField(
                 value = editingText,
                 onValueChange = { newEditingText -> editingText = newEditingText },
@@ -109,8 +95,7 @@ fun FolderItem(
                 )
             )
         } else {
-            // Show folder name when not editing
-            Text(text = folderName)
+            Text(text = folder.name)
         }
 
         Row(
@@ -121,33 +106,40 @@ fun FolderItem(
                 contentDescription = "Edit Folder Name",
                 modifier = Modifier.clickable(onClick = {
                     if (isEditing) {
-                        onEditCompleted(editingText) // Save changes when done editing
+                        onEditCompleted(editingText)
                     }
-                    isEditing = !isEditing // Toggle edit mode
+                    isEditing = !isEditing
                 })
             )
 
             Icon(
                 imageVector = Icons.Default.Delete,
                 contentDescription = "Delete Folder",
-                modifier = Modifier.clickable(onClick = onDelete)
+                modifier = Modifier.clickable(onClick = {
+                    viewModel.deleteFolder(folder)
+                })
             )
         }
     }
 }
 
 @Composable
-fun FoldersScreen(folders: List<String>, onFoldersUpdated: (List<String>) -> Unit) {
+fun FoldersScreen(
+    viewModel: FolderViewModel
+) {
+    val folders by viewModel.getAllFolders().observeAsState(emptyList())
+
     Column {
-        // Display the list of folders
-        FolderList(folders) { updatedFolders ->
-            onFoldersUpdated(updatedFolders)
-        }
+        FolderList(folders, viewModel)
     }
 }
 
+
 @Composable
-fun FolderList(folders: List<String>, onFoldersUpdated: (List<String>) -> Unit) {
+fun FolderList(
+    folders: List<Folder>,
+    viewModel: FolderViewModel
+) {
     Column {
         Spacer(Modifier.height(8.dp))
 
@@ -156,18 +148,13 @@ fun FolderList(folders: List<String>, onFoldersUpdated: (List<String>) -> Unit) 
         } else {
             folders.forEachIndexed { index, folder ->
                 FolderItem(
-                    folderName = folder,
+                    folder = folder,
+                    viewModel = viewModel,
                     onEditCompleted = { updatedName ->
-                        val updatedFolders = folders.toMutableList().apply {
-                            this[index] = updatedName
-                        }
-                        onFoldersUpdated(updatedFolders)
+                        // TODO: Handle the edit action
                     },
                     onDelete = {
-                        val updatedFolders = folders.toMutableList().apply {
-                            removeAt(index)
-                        }
-                        onFoldersUpdated(updatedFolders)
+                        // No need to manage list here. DB change will trigger recomposition.
                     }
                 )
                 Spacer(Modifier.height(4.dp))
@@ -175,6 +162,7 @@ fun FolderList(folders: List<String>, onFoldersUpdated: (List<String>) -> Unit) 
         }
     }
 }
+
 
 
 @Composable
