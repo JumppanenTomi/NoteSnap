@@ -5,23 +5,15 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -40,10 +32,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.NavHost
@@ -52,6 +42,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
 import fi.notesnap.notesnap.elements.AddFolderForm
 import fi.notesnap.notesnap.elements.AddNoteForm
+import fi.notesnap.notesnap.elements.BottomSheetNav
 import fi.notesnap.notesnap.elements.CameraCompose
 import fi.notesnap.notesnap.elements.FoldersScreen
 import fi.notesnap.notesnap.ui.theme.NoteSnapTheme
@@ -94,6 +85,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
             NoteSnapTheme {
                 val navController = rememberNavController()
@@ -137,9 +129,11 @@ class MainActivity : ComponentActivity() {
                                 startDestination = "folderList"
                             ) {
                                 composable("folderList") {
-                                    FoldersScreen(folders = folders, onFoldersUpdated = { updatedFolders ->
-                                        folders = updatedFolders
-                                    }) // Pass the current folders list to the FoldersScreen
+                                    FoldersScreen(
+                                        folders = folders,
+                                        onFoldersUpdated = { updatedFolders ->
+                                            folders = updatedFolders
+                                        }) // Pass the current folders list to the FoldersScreen
                                     toggleFloatingButton(true)
                                 }
 
@@ -211,76 +205,7 @@ class MainActivity : ComponentActivity() {
                                         startDestination = "options",
                                     ) {
                                         composable("options") {
-                                            Column(
-                                                Modifier
-                                                    .padding(16.dp)
-                                                    .defaultMinSize(minHeight = 200.dp)
-                                                    .fillMaxWidth()
-                                            ) {
-                                                Row(
-                                                    Modifier
-                                                        .height(60.dp)
-                                                        .padding(8.dp)
-                                                        .fillMaxWidth()
-                                                        .clickable {
-                                                            bottomSheetNavController.navigate(
-                                                                "addFolder"
-                                                            )
-                                                        },
-                                                    Arrangement.Start,
-                                                    Alignment.CenterVertically
-                                                ) {
-                                                    Icon(Icons.Filled.Add, "Add new folder")
-                                                    Text(
-                                                        "Add new folder",
-                                                        Modifier.padding(horizontal = 8.dp)
-                                                    )
-                                                }
-                                                Divider()
-                                                Row(
-                                                    Modifier
-                                                        .height(60.dp)
-                                                        .padding(8.dp)
-                                                        .fillMaxWidth()
-                                                        .clickable {
-                                                            bottomSheetNavController.navigate(
-                                                                "addNote"
-                                                            )
-                                                        },
-                                                    Arrangement.Start,
-                                                    Alignment.CenterVertically
-                                                ) {
-                                                    Icon(Icons.Filled.Create, "Add new note")
-                                                    Text(
-                                                        "Add new note",
-                                                        Modifier.padding(horizontal = 8.dp)
-                                                    )
-                                                }
-                                                Divider()
-                                                Row(
-                                                    Modifier
-                                                        .height(60.dp)
-                                                        .padding(8.dp)
-                                                        .fillMaxWidth()
-                                                        .clickable {
-                                                            bottomSheetNavController.navigate(
-                                                                "addWithCamera"
-                                                            )
-                                                        },
-                                                    Arrangement.Start,
-                                                    Alignment.CenterVertically
-                                                ) {
-                                                    Icon(
-                                                        Icons.Filled.Add,
-                                                        "Add new note using camera and AI"
-                                                    )
-                                                    Text(
-                                                        "Add new note using camera and AI",
-                                                        Modifier.padding(horizontal = 8.dp)
-                                                    )
-                                                }
-                                                Divider()
-                                            }
+                                            BottomSheetNav(navController = bottomSheetNavController)
                                         }
                                         composable("addNote") {
                                             AddNoteForm(
@@ -293,7 +218,6 @@ class MainActivity : ComponentActivity() {
                                         composable("addFolder") {
                                             AddFolderForm(onAddFolder = { newFolder ->
                                                 folders = folders + newFolder
-                                                // Navigate back or perform other actions after adding the folder
                                             })
                                         }
                                         composable("addWithCamera") {
@@ -369,5 +293,4 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
 }
