@@ -175,7 +175,14 @@ fun NoteScreen(navController: NavController, viewModel: NoteViewModelV2) {
             onDismissRequest = { showNoteDetails = false },
             modifier = Modifier.fillMaxSize(),
         ) {
-            NoteDetailsView(selectedNote!!, viewModel = viewModel)
+            fun toggleShowNoteDetails(boolean: Boolean) {
+                showNoteDetails = boolean
+            }
+            NoteDetailsView(
+                selectedNote!!,
+                viewModel = viewModel,
+                toggleNoteDetails = ::toggleShowNoteDetails
+            )
         }
     }
 }
