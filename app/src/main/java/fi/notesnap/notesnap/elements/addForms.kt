@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.runtime.livedata.observeAsState
 
 
 @Composable
@@ -124,20 +125,20 @@ fun FolderItem(
 
 @Composable
 fun FoldersScreen(
-    folders: List<Folder>,
-    viewModel: FolderViewModel,
-    onFoldersUpdated: (List<Folder>) -> Unit
+    viewModel: FolderViewModel
 ) {
+    val folders by viewModel.getAllFolders().observeAsState(emptyList())
+
     Column {
-        FolderList(folders, viewModel, onFoldersUpdated)
+        FolderList(folders, viewModel)
     }
 }
+
 
 @Composable
 fun FolderList(
     folders: List<Folder>,
-    viewModel: FolderViewModel,
-    onFoldersUpdated: (List<Folder>) -> Unit
+    viewModel: FolderViewModel
 ) {
     Column {
         Spacer(Modifier.height(8.dp))
@@ -150,17 +151,10 @@ fun FolderList(
                     folder = folder,
                     viewModel = viewModel,
                     onEditCompleted = { updatedName ->
-                        val updatedFolders = folders.toMutableList().apply {
-                            this[index] = this[index].copy(name = updatedName)
-                        }
-                        onFoldersUpdated(updatedFolders)
+                        // TODO: Handle the edit action
                     },
-
                     onDelete = {
-                        val updatedFolders = folders.toMutableList().apply {
-                            removeAt(index)
-                        }
-                        onFoldersUpdated(updatedFolders)
+                        // No need to manage list here. DB change will trigger recomposition.
                     }
                 )
                 Spacer(Modifier.height(4.dp))
@@ -168,6 +162,7 @@ fun FolderList(
         }
     }
 }
+
 
 
 @Composable

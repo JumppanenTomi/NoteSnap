@@ -95,7 +95,6 @@ class MainActivity : ComponentActivity() {
                     },
                     content = { innerPadding ->
                         Column(Modifier.padding(innerPadding)) {
-                            var folders by remember { mutableStateOf(listOf<Folder>()) }
 
                             NavHost(
                                 navController,
@@ -104,12 +103,9 @@ class MainActivity : ComponentActivity() {
                                 composable("folderList") {
                                     val folderViewModel: FolderViewModel = viewModel()
 
+                                    // Removed the folders and onFoldersUpdated parameters
                                     FoldersScreen(
-                                        viewModel = folderViewModel,
-                                        folders = folders,
-                                        onFoldersUpdated = { updatedFolders ->
-                                            folders = updatedFolders
-                                        }
+                                        viewModel = folderViewModel
                                     )
                                     toggleFloatingButton(true)
                                 }
