@@ -29,6 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import fi.notesnap.notesnap.elements.FolderSelector
 import fi.notesnap.notesnap.entities.Note
 import fi.notesnap.notesnap.viewmodels.NoteViewModelV2
 import java.util.Date
@@ -38,7 +39,7 @@ fun NoteDetailsView(note: Note, viewModel: NoteViewModelV2) {
     var title = remember { mutableStateOf(note.title) }
     var content = remember { mutableStateOf(note.content) }
     var locked = remember { mutableStateOf(note.locked) } // Changed to Boolean
-
+    FolderSelector(viewModelV2 = viewModel)
     Column(
         Modifier
             .padding(16.dp)
@@ -67,6 +68,7 @@ fun NoteDetailsView(note: Note, viewModel: NoteViewModelV2) {
         }
 
         Spacer(Modifier.height(16.dp))
+
 
         // Toggle button for locked/unlocked
         Icon(
