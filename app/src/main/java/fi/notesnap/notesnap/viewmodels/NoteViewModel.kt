@@ -1,6 +1,7 @@
 package fi.notesnap.notesnap.viewmodels
 
 import android.app.Application
+import androidx.compose.runtime.MutableState
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
@@ -40,9 +41,14 @@ class NoteViewModelV2(application: Application) : AndroidViewModel(application) 
         return noteDao.getNoteById(noteId)
     }
 
-    fun getAllFolders() :LiveData<List<Folder>>{
-         return folderDao.getAllFolders()
+    fun getAllFolders(): LiveData<List<Folder>> {
+        return folderDao.getAllFolders()
     }
+
+    fun getFolderById(id: MutableState<Long?>): LiveData<Folder> {
+        return folderDao.getFolderById(state.value.folderId)
+    }
+
 
     /*
     fun getNoteById(noteId: Long): LiveData<Note?> {
