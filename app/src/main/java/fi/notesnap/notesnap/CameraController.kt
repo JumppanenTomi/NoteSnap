@@ -1,6 +1,7 @@
 import android.content.Context
 import android.util.Log.d
 import android.util.Log.e
+import androidx.camera.core.AspectRatio
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY
@@ -39,12 +40,14 @@ class CameraController(
         owner: LifecycleOwner,
     ) {
         cameraProviderFuture.addListener({
-            val preview = Preview.Builder().build().also {
-                it.setSurfaceProvider(previewView.surfaceProvider)
-            }
+            val preview =
+                Preview.Builder().setTargetAspectRatio(AspectRatio.RATIO_16_9).build().also {
+                    it.setSurfaceProvider(previewView.surfaceProvider)
+                }
 
             imageCapture =
-                ImageCapture.Builder().setCaptureMode(CAPTURE_MODE_MAXIMIZE_QUALITY).build()
+                ImageCapture.Builder().setTargetAspectRatio(AspectRatio.RATIO_16_9)
+                    .setCaptureMode(CAPTURE_MODE_MAXIMIZE_QUALITY).build()
 
             val camSelector =
                 CameraSelector.Builder().requireLensFacing(CameraSelector.LENS_FACING_BACK).build()

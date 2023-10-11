@@ -10,9 +10,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
@@ -177,8 +179,6 @@ fun FolderList(folders: List<String>, onFoldersUpdated: (List<String>) -> Unit) 
 }
 
 
-
-
 @Composable
 fun AddNoteForm(
     titleFromCamera: String?,
@@ -230,8 +230,9 @@ fun AddNoteForm(
         Column(
             Modifier
                 .padding(16.dp)
-                .fillMaxWidth(),
-            Arrangement.Center,
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState()),
+            Arrangement.Top,
             Alignment.Start
         ) {
             Text("Add new note", style = MaterialTheme.typography.headlineMedium)
@@ -309,7 +310,8 @@ fun AddNoteForm(
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .wrapContentHeight(), Arrangement.End
+                    .wrapContentHeight(),
+                Arrangement.End
             ) {
                 Button(onClick = { viewModelV2.insertNote(title!!, content!!) }) {
                     Text(text = "Save")
