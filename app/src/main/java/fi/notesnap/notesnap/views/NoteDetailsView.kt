@@ -1,6 +1,7 @@
 package fi.notesnap.notesnap.views
 
 import android.annotation.SuppressLint
+import androidx.biometric.BiometricManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -55,6 +56,7 @@ fun NoteDetailsView(note: Note, viewModel: NoteViewModelV2, toggleNoteDetails: (
 
     var isDialogVisible = remember { mutableStateOf(false) }
     val listOfFolders by viewModel.getAllFolders().observeAsState(initial = emptyList())
+
 
 
     var currentFolder by remember { mutableStateOf("Choose Folder") }
