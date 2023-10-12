@@ -49,9 +49,9 @@ import fi.notesnap.notesnap.daos.FolderDao
 import fi.notesnap.notesnap.data.entities.Folder
 import fi.notesnap.notesnap.data.entities.Note
 import fi.notesnap.notesnap.data.state.FolderState
-import fi.notesnap.notesnap.data.viewmodels.NoteViewModelV2
 import fi.notesnap.notesnap.elements.ListNotes
 import fi.notesnap.notesnap.elements.Search
+import fi.notesnap.notesnap.viewmodels.NoteViewModelV2
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

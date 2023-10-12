@@ -5,10 +5,10 @@ import androidx.compose.runtime.MutableState
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
-import fi.notesnap.notesnap.AppDatabase
-import fi.notesnap.notesnap.NoteState
-import fi.notesnap.notesnap.entities.Folder
-import fi.notesnap.notesnap.entities.Note
+import fi.notesnap.notesnap.data.AppDatabase
+import fi.notesnap.notesnap.data.entities.Folder
+import fi.notesnap.notesnap.data.entities.Note
+import fi.notesnap.notesnap.data.state.NoteState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
