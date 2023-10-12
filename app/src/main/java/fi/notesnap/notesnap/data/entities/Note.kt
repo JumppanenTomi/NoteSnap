@@ -1,4 +1,4 @@
-package fi.notesnap.notesnap.entities
+package fi.notesnap.notesnap.data.entities
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

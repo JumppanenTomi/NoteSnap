@@ -1,6 +1,5 @@
 package fi.notesnap.notesnap.elements
 
-import CameraController
 import android.content.Context
 import android.content.pm.PackageManager
 import android.util.Log
@@ -30,7 +29,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
-import fi.notesnap.notesnap.CameraUtilities.REQUIRED_PERMISSIONS
+import fi.notesnap.notesnap.utilities.CameraController
+import fi.notesnap.notesnap.utilities.CameraUtilities.REQUIRED_PERMISSIONS
 
 @Composable
 fun CameraCompose(

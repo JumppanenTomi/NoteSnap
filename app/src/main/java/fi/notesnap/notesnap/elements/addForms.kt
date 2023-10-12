@@ -39,9 +39,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import fi.notesnap.notesnap.data.viewmodels.NoteViewModelV2
 import fi.notesnap.notesnap.machineLearning.translateString
 import fi.notesnap.notesnap.utilities.languageCodeToNameMap
-import fi.notesnap.notesnap.viewmodels.NoteViewModelV2
 
 
 // Modify the AddFolderForm to accept a callback function for adding folders
@@ -148,12 +148,13 @@ fun FoldersScreen(folders: List<String>, onFoldersUpdated: (List<String>) -> Uni
 
 @Composable
 fun FolderList(folders: List<String>, onFoldersUpdated: (List<String>) -> Unit) {
-    Column {
+    Column(Modifier.padding(horizontal = 16.dp)) {
         Spacer(Modifier.height(8.dp))
 
         if (folders.isEmpty()) {
             Text(text = "No folders added yet.")
         } else {
+            Search(folders, null, null, null)
             folders.forEachIndexed { index, folder ->
                 FolderItem(
                     folderName = folder,

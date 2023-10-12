@@ -36,20 +36,20 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import fi.notesnap.notesnap.data.viewmodels.NoteViewModelV2
 import fi.notesnap.notesnap.elements.AddFolderForm
 import fi.notesnap.notesnap.elements.AddNoteForm
 import fi.notesnap.notesnap.elements.BottomSheetNav
 import fi.notesnap.notesnap.elements.CameraCompose
 import fi.notesnap.notesnap.elements.FoldersScreen
 import fi.notesnap.notesnap.ui.theme.NoteSnapTheme
-import fi.notesnap.notesnap.viewmodels.NoteViewModelV2
 import fi.notesnap.notesnap.views.NoteScreen
 import fi.notesnap.notesnap.views.SettingsView
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
-    private val noteViewModelV2:NoteViewModelV2 by viewModels()
+    private val noteViewModelV2: NoteViewModelV2 by viewModels()
 
     @OptIn(ExperimentalMaterial3Api::class)
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "CoroutineCreationDuringComposition")
@@ -117,7 +117,10 @@ class MainActivity : ComponentActivity() {
                                         folderDao = db.folderDao()
                                     )
                                     */
-                                    NoteScreen(navController = navController, viewModel = noteViewModelV2)
+                                    NoteScreen(
+                                        navController = navController,
+                                        viewModel = noteViewModelV2
+                                    )
                                 }
 
                                 composable("settings") {

@@ -1,4 +1,4 @@
-package fi.notesnap.notesnap.entities
+package fi.notesnap.notesnap.data.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

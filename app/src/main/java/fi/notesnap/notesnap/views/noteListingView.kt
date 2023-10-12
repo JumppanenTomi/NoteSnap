@@ -45,12 +45,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import fi.notesnap.notesnap.FolderState
-import fi.notesnap.notesnap.daos.FolderDao
+import fi.notesnap.notesnap.data.daos.FolderDao
+import fi.notesnap.notesnap.data.entities.Folder
+import fi.notesnap.notesnap.data.entities.Note
+import fi.notesnap.notesnap.data.state.FolderState
+import fi.notesnap.notesnap.data.viewmodels.NoteViewModelV2
 import fi.notesnap.notesnap.elements.ListNotes
-import fi.notesnap.notesnap.entities.Folder
-import fi.notesnap.notesnap.entities.Note
-import fi.notesnap.notesnap.viewmodels.NoteViewModelV2
+import fi.notesnap.notesnap.elements.Search
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -69,6 +70,14 @@ fun NoteScreen(navController: NavController, viewModel: NoteViewModelV2) {
     var selectedNote by remember { mutableStateOf<Note?>(null) }
     var showLayoutOptions by remember { mutableStateOf(false) }
 
+    fun setSelectedNote(note: Note) {
+        selectedNote = note
+    }
+
+    fun setShowNote(boolean: Boolean) {
+        showNoteDetails = boolean
+    }
+
     // Define the number of columns for the grid layout
     val columns = when (layoutMode) {
         LayoutMode.Small -> 1
@@ -77,6 +86,14 @@ fun NoteScreen(navController: NavController, viewModel: NoteViewModelV2) {
     }
 
     Column {
+        if (notes.value.isNotEmpty()) {
+            Search(
+                folderList = null,
+                noteList = notes.value,
+                setNote = ::setSelectedNote,
+                setVisibility = ::setShowNote
+            )
+        }
         Icon(
             Icons.Default.MoreVert,
             contentDescription = "More Options",

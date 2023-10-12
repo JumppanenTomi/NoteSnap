@@ -20,7 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import fi.notesnap.notesnap.entities.Note
+import fi.notesnap.notesnap.data.entities.Note
 
 @Composable
 fun ListNotes(children: List<Note>, navController: NavController) {

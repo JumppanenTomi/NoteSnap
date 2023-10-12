@@ -1,12 +1,11 @@
-package fi.notesnap.notesnap.daos
+package fi.notesnap.notesnap.data.daos
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Upsert
-import fi.notesnap.notesnap.entities.Folder
+import fi.notesnap.notesnap.data.entities.Folder
 
 @Dao
 interface FolderDao {
