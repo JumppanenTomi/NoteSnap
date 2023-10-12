@@ -63,7 +63,6 @@ import kotlinx.coroutines.withContext
 fun NoteScreen(navController: NavController, viewModel: NoteViewModelV2) {
     // State to track the current layout mode (small, big, card)
     var layoutMode by remember { mutableStateOf(LayoutMode.Small) }
-
     // Observe notes from the view model
     val notes = viewModel.getAllNotes().observeAsState(listOf())
     var showNoteDetails by remember { mutableStateOf(false) }

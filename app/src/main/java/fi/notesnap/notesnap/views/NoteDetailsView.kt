@@ -33,18 +33,64 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import fi.notesnap.notesnap.data.entities.Note
-import fi.notesnap.notesnap.data.viewmodels.NoteViewModelV2
+import androidx.compose.ui.window.Dialog
+import fi.notesnap.notesnap.entities.Note
+import fi.notesnap.notesnap.viewmodels.NoteViewModelV2
 
+@SuppressLint("StateFlowValueCalledInComposition", "UnrememberedMutableState")
 @Composable
 fun NoteDetailsView(note: Note, viewModel: NoteViewModelV2, toggleNoteDetails: (Boolean) -> Unit) {
-    var id = remember { mutableLongStateOf(note.id) }
-    var title = remember { mutableStateOf(note.title) }
-    var content = remember { mutableStateOf(note.content) }
-    var locked = remember { mutableStateOf(note.locked) } // Changed to Boolean
+    val id = remember { mutableLongStateOf(note.id) }
+    val title = remember { mutableStateOf(note.title) }
+    val content = remember { mutableStateOf(note.content) }
+    val locked = remember { mutableStateOf(note.locked) } // Changed to Boolean
+    val folderId = remember { mutableStateOf(note.folderId) }
+
+    var isDialogVisible = remember { mutableStateOf(false) }
+    val listOfFolders by viewModel.getAllFolders().observeAsState(initial = emptyList())
+
+
+    var currentFolder by remember { mutableStateOf("Choose Folder") }
 
     var deleteEvent by remember {
         mutableStateOf(false)
+    }
+//dialog to choose a folder (hidden)
+    if (isDialogVisible.value) {
+        Dialog(
+            onDismissRequest = { isDialogVisible.value = false },
+            content = {
+                LazyColumn() {
+                    items(listOfFolders) { folder ->
+                        Row(
+                            Modifier
+                                .background(Color.White)
+                                .padding(16.dp)
+                                .fillMaxWidth()
+                                .clickable {
+                                    folderId.value = folder.id
+                                    isDialogVisible.value = false
+                                    currentFolder = if (folderId != null) {
+                                        folder.name
+                                    } else {
+                                        "Choose Folder"
+                                    }
+
+                                }) {
+                            Text(
+                                text = folder.name,
+                                style = TextStyle(fontWeight = FontWeight.Normal),
+                                fontSize = 26.sp,
+                            )
+                        }
+                        Divider(
+                            modifier = Modifier.fillMaxWidth(), color = Color.Gray, thickness = 1.dp
+                        )
+                    }
+                }
+
+            }
+        )
     }
 
     Column(
@@ -64,6 +110,7 @@ fun NoteDetailsView(note: Note, viewModel: NoteViewModelV2, toggleNoteDetails: (
                         title = title.value,
                         content = content.value,
                         locked = locked.value,
+                        folderId = folderId.value,
                         updatedAt = System.currentTimeMillis()
                     )
                     viewModel.updateNote(updatedNote)
@@ -85,6 +132,14 @@ fun NoteDetailsView(note: Note, viewModel: NoteViewModelV2, toggleNoteDetails: (
                 .size(24.dp)
                 .clickable { locked.value = !locked.value }
         )
+        // show the dialog
+        Button(onClick = {
+            isDialogVisible.value = true
+
+
+        }) {
+            Text(text = currentFolder)
+        }
 
         Spacer(Modifier.height(8.dp))
 

@@ -1,18 +1,21 @@
-package fi.notesnap.notesnap.data.viewmodels
+package fi.notesnap.notesnap.viewmodels
 
 import android.app.Application
+import androidx.compose.runtime.MutableState
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
-import fi.notesnap.notesnap.data.AppDatabase
-import fi.notesnap.notesnap.data.entities.Note
-import fi.notesnap.notesnap.data.state.NoteState
+import fi.notesnap.notesnap.AppDatabase
+import fi.notesnap.notesnap.NoteState
+import fi.notesnap.notesnap.entities.Folder
+import fi.notesnap.notesnap.entities.Note
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 class NoteViewModelV2(application: Application) : AndroidViewModel(application) {
     private val database = AppDatabase.getInstance(application)
     private val noteDao = database.noteDao()
+    private val folderDao = database.folderDao()
     var state = MutableStateFlow(NoteState())
 
 
@@ -37,6 +40,15 @@ class NoteViewModelV2(application: Application) : AndroidViewModel(application) 
     fun getNoteById(noteId: Long): LiveData<Note> {
         return noteDao.getNoteById(noteId)
     }
+
+    fun getAllFolders(): LiveData<List<Folder>> {
+        return folderDao.getAllFolders()
+    }
+
+    fun getFolderById(id: MutableState<Long?>): LiveData<Folder> {
+        return folderDao.getFolderById(state.value.folderId)
+    }
+
 
     /*
     fun getNoteById(noteId: Long): LiveData<Note?> {
