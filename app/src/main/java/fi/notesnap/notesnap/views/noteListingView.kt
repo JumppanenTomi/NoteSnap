@@ -1,6 +1,8 @@
 package fi.notesnap.notesnap.views
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -46,6 +48,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.fragment.app.FragmentActivity
 import androidx.navigation.NavController
 import fi.notesnap.notesnap.daos.FolderDao
 import fi.notesnap.notesnap.data.entities.Folder
@@ -66,7 +69,7 @@ import java.time.format.DateTimeFormatter
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun NoteScreen(navController: NavController, viewModel: NoteViewModelV2) {
+fun NoteScreen(navController: NavController, viewModel: NoteViewModelV2, context: Context, fragmentActivity: FragmentActivity) {
     // State to track the current layout mode (small, big, card)
     var layoutMode by remember { mutableStateOf(LayoutMode.Small) }
     // Observe notes from the view model
@@ -82,6 +85,12 @@ fun NoteScreen(navController: NavController, viewModel: NoteViewModelV2) {
     fun setShowNote(boolean: Boolean) {
         showNoteDetails = boolean
     }
+
+    fun toggleShowNoteDetails(boolean: Boolean) {
+        showNoteDetails = boolean
+    }
+
+    var biometricUnlockNote = BiometricUnlockNote(context, fragmentActivity, ::toggleShowNoteDetails)
 
     // Define the number of columns for the grid layout
     val columns = when (layoutMode) {
@@ -122,18 +131,37 @@ fun NoteScreen(navController: NavController, viewModel: NoteViewModelV2) {
         ) {
             items(notes.value) { note ->
                 when (layoutMode) {
-                    LayoutMode.Small, LayoutMode.Big -> ListNoteItem(note, layoutMode) {
+                    LayoutMode.Small -> SmallNoteItem(note) {
                         selectedNote = note
+                        if(selectedNote!!.locked){
+                            showNoteDetails = false
+                            biometricUnlockNote.authenticate()
+                        }else{
                         showNoteDetails = true
+                        }
                     }
+
+                    LayoutMode.Big -> BigNoteItem(note) {
+                        selectedNote = note
+                        if(selectedNote!!.locked){
+                            showNoteDetails = false
+                            biometricUnlockNote.authenticate()
+                        }else{
+                            showNoteDetails = true
+                        }                    }
 
                     LayoutMode.Card -> CardNoteItem(note) {
                         selectedNote = note
-                        showNoteDetails = true
-                    }
+                        if(selectedNote!!.locked){
+                            showNoteDetails = false
+                            biometricUnlockNote.authenticate()
+                        }else{
+                            showNoteDetails = true
+                        }                    }
                 }
             }
         }
+
     }
 
     if (showLayoutOptions) {
@@ -187,9 +215,7 @@ fun NoteScreen(navController: NavController, viewModel: NoteViewModelV2) {
             onDismissRequest = { showNoteDetails = false },
             modifier = Modifier.fillMaxSize(),
         ) {
-            fun toggleShowNoteDetails(boolean: Boolean) {
-                showNoteDetails = boolean
-            }
+
             NoteDetailsView(
                 selectedNote!!,
                 viewModel = viewModel,
@@ -216,6 +242,10 @@ fun FolderNoteScreen(navController: NavController, viewModel: NoteViewModelV2, f
     }
 
     fun setShowNote(boolean: Boolean) {
+        showNoteDetails = boolean
+    }
+
+    fun toggleShowNoteDetails(boolean: Boolean) {
         showNoteDetails = boolean
     }
 
@@ -258,7 +288,13 @@ fun FolderNoteScreen(navController: NavController, viewModel: NoteViewModelV2, f
         ) {
             items(notes.value) { note ->
                 when (layoutMode) {
-                    LayoutMode.Small, LayoutMode.Big -> ListNoteItem(note, layoutMode) {
+                    LayoutMode.Small -> SmallNoteItem(note) {
+                        if (selectedNote!!.locked){}
+                        selectedNote = note
+                        showNoteDetails = true
+                    }
+
+                    LayoutMode.Big -> BigNoteItem(note) {
                         selectedNote = note
                         showNoteDetails = true
                     }
@@ -328,9 +364,7 @@ fun FolderNoteScreen(navController: NavController, viewModel: NoteViewModelV2, f
             onDismissRequest = { showNoteDetails = false },
             modifier = Modifier.fillMaxSize(),
         ) {
-            fun toggleShowNoteDetails(boolean: Boolean) {
-                showNoteDetails = boolean
-            }
+
             NoteDetailsView(
                 selectedNote!!,
                 viewModel = viewModel,
