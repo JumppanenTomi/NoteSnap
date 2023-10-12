@@ -45,7 +45,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import fi.notesnap.notesnap.data.daos.FolderDao
+import fi.notesnap.notesnap.daos.FolderDao
 import fi.notesnap.notesnap.data.entities.Folder
 import fi.notesnap.notesnap.data.entities.Note
 import fi.notesnap.notesnap.data.state.FolderState

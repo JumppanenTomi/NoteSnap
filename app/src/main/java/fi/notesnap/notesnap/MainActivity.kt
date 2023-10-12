@@ -43,10 +43,8 @@ import fi.notesnap.notesnap.elements.AddNoteForm
 import fi.notesnap.notesnap.elements.BottomSheetNav
 import fi.notesnap.notesnap.elements.CameraCompose
 import fi.notesnap.notesnap.elements.FoldersScreen
-import fi.notesnap.notesnap.entities.Folder
 import fi.notesnap.notesnap.ui.theme.NoteSnapTheme
 import fi.notesnap.notesnap.viewmodels.FolderViewModel
-import fi.notesnap.notesnap.viewmodels.NoteViewModelV2
 import fi.notesnap.notesnap.views.NoteScreen
 import fi.notesnap.notesnap.views.SettingsView
 import kotlinx.coroutines.launch

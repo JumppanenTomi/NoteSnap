@@ -5,8 +5,8 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
-import fi.notesnap.notesnap.AppDatabase
-import fi.notesnap.notesnap.entities.Folder
+import fi.notesnap.notesnap.data.AppDatabase
+import fi.notesnap.notesnap.data.entities.Folder
 import kotlinx.coroutines.launch
 
 class FolderViewModel(application: Application) : AndroidViewModel(application) {

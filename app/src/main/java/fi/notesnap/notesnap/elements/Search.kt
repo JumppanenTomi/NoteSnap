@@ -20,12 +20,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.unit.dp
+import fi.notesnap.notesnap.data.entities.Folder
 import fi.notesnap.notesnap.data.entities.Note
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Search(
-    folderList: List<String>?,
+    folderList: List<Folder>?,
     noteList: List<Note>?,
     setNote: ((Note) -> Unit)?,
     setVisibility: ((Boolean) -> Unit)?
@@ -50,11 +51,11 @@ fun Search(
         trailingIcon = { Icon(Icons.Default.MoreVert, contentDescription = null) },
     ) {
         if (folderList !== null) {
-            folderList.forEach { name ->
-                if (name.lowercase().contains(text.lowercase()) || text == "") {
+            folderList.forEach { folder ->
+                if (folder.name.lowercase().contains(text.lowercase()) || text == "") {
                     ListItem(
-                        headlineContent = { Text(name) },
-                        supportingContent = { Text("Additional info of folder $name") },
+                        headlineContent = { Text(folder.name) },
+                        supportingContent = { Text("Additional info of folder $folder") },
                         modifier = Modifier
                             .clickable {
                                 if (setVisibility != null) {
