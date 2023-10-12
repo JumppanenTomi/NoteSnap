@@ -33,6 +33,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -62,7 +63,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             NoteSnapTheme {
                 val navController = rememberNavController()
-                var selectedItem by remember { mutableStateOf("") }
+                var selectedItem by remember { mutableStateOf("folderList") }
                 val scrollBehavior =
                     TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
                 var folders by remember { mutableStateOf(listOf<String>()) }
@@ -93,7 +94,11 @@ class MainActivity : ComponentActivity() {
                         )
                     },
                     content = { innerPadding ->
-                        Column(Modifier.padding(innerPadding)) {
+                        Column(
+                            Modifier
+                                .padding(innerPadding)
+                                .padding(horizontal = 8.dp, vertical = 8.dp)
+                        ) {
                             var folders by remember { mutableStateOf(listOf("General")) }
 
                             NavHost(
@@ -196,16 +201,23 @@ class MainActivity : ComponentActivity() {
                     },
                     bottomBar = {
                         //TODO: planned icons are not yet implement in material 3 jetpack compose library so for now we use placeholders
-                        NavigationBar {
+                        NavigationBar(
+                            contentColor = MaterialTheme.colorScheme.primary,
+                        ) {
                             NavigationBarItem(
                                 icon = {
                                     Icon(
                                         Icons.Filled.Home,
-                                        contentDescription = "Folders view"
+                                        contentDescription = "Folders view",
+                                        tint = MaterialTheme.colorScheme.primary
                                     )
                                 },
-                                label = { Text("Folders") },
-                                selected = selectedItem == "folders",
+                                label = {
+                                    Text(
+                                        "Folders",
+                                    )
+                                },
+                                selected = selectedItem == "folderList",
                                 onClick = {
                                     selectedItem =
                                         "folderList"; navController.navigate("folderList")
@@ -215,11 +227,12 @@ class MainActivity : ComponentActivity() {
                                 icon = {
                                     Icon(
                                         Icons.Filled.List,
-                                        contentDescription = "Notes view"
+                                        contentDescription = "Notes view",
+                                        tint = MaterialTheme.colorScheme.primary
                                     )
                                 },
                                 label = { Text("Notes") },
-                                selected = selectedItem == "notes",
+                                selected = selectedItem == "noteList",
                                 onClick = {
                                     selectedItem =
                                         "noteList"; navController.navigate("noteList")
@@ -229,7 +242,8 @@ class MainActivity : ComponentActivity() {
                                 icon = {
                                     Icon(
                                         Icons.Filled.Settings,
-                                        contentDescription = "Settings view"
+                                        contentDescription = "Settings view",
+                                        tint = MaterialTheme.colorScheme.primary
                                     )
                                 },
                                 label = { Text("Settings") },

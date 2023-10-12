@@ -4,7 +4,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -37,7 +36,6 @@ fun Search(
     SearchBar(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 16.dp)
             .semantics { traversalIndex = -1f },
         query = text,
         onQueryChange = { text = it },
@@ -48,7 +46,6 @@ fun Search(
         },
         placeholder = { Text("Hinted search text") },
         leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-        trailingIcon = { Icon(Icons.Default.MoreVert, contentDescription = null) },
     ) {
         if (folderList !== null) {
             folderList.forEach { folder ->
