@@ -78,7 +78,7 @@ fun NoteDetailsView(note: Note, viewModel: NoteViewModelV2, toggleNoteDetails: (
                                     folderId.value = folder.id
                                     isDialogVisible.value = false
                                     currentFolder = if (folderId != null) {
-                                        listOfFolders.get(folderId.value!!.toInt() - 1).name
+                                        folder.name
                                     } else {
                                         "Choose Folder"
                                     }
@@ -173,7 +173,6 @@ fun NoteDetailsView(note: Note, viewModel: NoteViewModelV2, toggleNoteDetails: (
             label = { Text("Content") },
             modifier = Modifier
                 .fillMaxWidth() // Content takes up most of the space
-                .height(100.dp)
         )
 
         Spacer(Modifier.height(24.dp))
