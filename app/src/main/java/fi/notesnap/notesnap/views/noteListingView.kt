@@ -1,7 +1,6 @@
 package fi.notesnap.notesnap.views
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,8 +19,10 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -40,8 +41,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -57,6 +58,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.time.Instant
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -117,12 +122,7 @@ fun NoteScreen(navController: NavController, viewModel: NoteViewModelV2) {
         ) {
             items(notes.value) { note ->
                 when (layoutMode) {
-                    LayoutMode.Small -> SmallNoteItem(note) {
-                        selectedNote = note
-                        showNoteDetails = true
-                    }
-
-                    LayoutMode.Big -> BigNoteItem(note) {
+                    LayoutMode.Small, LayoutMode.Big -> ListNoteItem(note, layoutMode) {
                         selectedNote = note
                         showNoteDetails = true
                     }
@@ -134,7 +134,6 @@ fun NoteScreen(navController: NavController, viewModel: NoteViewModelV2) {
                 }
             }
         }
-
     }
 
     if (showLayoutOptions) {
@@ -148,8 +147,7 @@ fun NoteScreen(navController: NavController, viewModel: NoteViewModelV2) {
                     .fillMaxWidth()
             ) {
                 Text(
-                    text = "Choose Layout Mode",
-                    style = MaterialTheme.typography.titleMedium
+                    text = "Choose Layout Mode", style = MaterialTheme.typography.titleMedium
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -160,24 +158,21 @@ fun NoteScreen(navController: NavController, viewModel: NoteViewModelV2) {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     LayoutOptionButton(
-                        layoutMode = LayoutMode.Small,
-                        currentLayoutMode = layoutMode
+                        layoutMode = LayoutMode.Small, currentLayoutMode = layoutMode
                     ) {
                         layoutMode = LayoutMode.Small
                         showLayoutOptions = false
                     }
 
                     LayoutOptionButton(
-                        layoutMode = LayoutMode.Big,
-                        currentLayoutMode = layoutMode
+                        layoutMode = LayoutMode.Big, currentLayoutMode = layoutMode
                     ) {
                         layoutMode = LayoutMode.Big
                         showLayoutOptions = false
                     }
 
                     LayoutOptionButton(
-                        layoutMode = LayoutMode.Card,
-                        currentLayoutMode = layoutMode
+                        layoutMode = LayoutMode.Card, currentLayoutMode = layoutMode
                     ) {
                         layoutMode = LayoutMode.Card
                         showLayoutOptions = false
@@ -263,12 +258,7 @@ fun FolderNoteScreen(navController: NavController, viewModel: NoteViewModelV2, f
         ) {
             items(notes.value) { note ->
                 when (layoutMode) {
-                    LayoutMode.Small -> SmallNoteItem(note) {
-                        selectedNote = note
-                        showNoteDetails = true
-                    }
-
-                    LayoutMode.Big -> BigNoteItem(note) {
+                    LayoutMode.Small, LayoutMode.Big -> ListNoteItem(note, layoutMode) {
                         selectedNote = note
                         showNoteDetails = true
                     }
@@ -352,9 +342,7 @@ fun FolderNoteScreen(navController: NavController, viewModel: NoteViewModelV2, f
 
 @Composable
 fun LayoutOptionButton(
-    layoutMode: LayoutMode,
-    currentLayoutMode: LayoutMode,
-    onLayoutSelected: () -> Unit
+    layoutMode: LayoutMode, currentLayoutMode: LayoutMode, onLayoutSelected: () -> Unit
 ) {
     val isSelected = layoutMode == currentLayoutMode
 
@@ -363,12 +351,10 @@ fun LayoutOptionButton(
             .height(100.dp)
             .width(100.dp)
             .padding(8.dp)
-            .clickable { onLayoutSelected() },
-        shape = RoundedCornerShape(8.dp)
+            .clickable { onLayoutSelected() }, shape = RoundedCornerShape(8.dp)
     ) {
         Column(
-            modifier = Modifier
-                .padding(16.dp),
+            modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -392,98 +378,170 @@ enum class LayoutMode(val label: String) {
     Small("Small"), Big("Big"), Card("Card")
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun SmallNoteItem(note: Note, onClick: () -> Unit) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RectangleShape,
-        onClick = onClick
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Text(text = note.title.takeUnless { it.isBlank() } ?: "(No title)",
-                style = TextStyle(fontWeight = FontWeight.Bold),
-                fontSize = 18.sp,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis)
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = note.content,
-                style = TextStyle(fontWeight = FontWeight.Normal),
-                fontSize = 16.sp,
-                maxLines = 3,
-                overflow = TextOverflow.Ellipsis
-            )
-        }
-    }
+fun formatUpdatedAt(updatedAt: Long): String {
+    val currentInstant = Instant.ofEpochMilli(System.currentTimeMillis())
+    val updatedAtInstant = Instant.ofEpochMilli(updatedAt)
 
-    // Add a gray separator line between items
-    Divider(
-        modifier = Modifier.fillMaxWidth(), color = Color.Gray, thickness = 1.dp
-    )
+    val currentZonedDateTime = ZonedDateTime.ofInstant(currentInstant, ZoneId.systemDefault())
+    val updatedAtZonedDateTime = ZonedDateTime.ofInstant(updatedAtInstant, ZoneId.systemDefault())
+
+    val formatter = DateTimeFormatter.ofPattern("HH:mm") // Format for time
+
+    // Check if it's the same date
+    return if (currentZonedDateTime.toLocalDate() == updatedAtZonedDateTime.toLocalDate()) {
+        updatedAtZonedDateTime.format(formatter) // Format for time
+    } else {
+        updatedAtZonedDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) // Format for date
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BigNoteItem(note: Note, onClick: () -> Unit) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RectangleShape,
-        onClick = onClick
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
+fun ListNoteItem(note: Note, layoutMode: LayoutMode, onClick: () -> Unit) {
+    Column {
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RectangleShape,
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.background,
+            ),
+            onClick = onClick
         ) {
-            Text(text = note.title.takeUnless { it.isBlank() } ?: "(No title)",
-                style = TextStyle(fontWeight = FontWeight.Bold),
-                fontSize = 18.sp,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis)
-            Spacer(modifier = Modifier.height(16.dp)) // Increased spacing for description
-            Text(
-                text = note.content,
-                style = TextStyle(fontWeight = FontWeight.Normal),
-                fontSize = 16.sp,
-                maxLines = Int.MAX_VALUE,
-                overflow = TextOverflow.Visible
-            )
-        }
-    }
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
 
-    // Add a gray separator line between items
-    Divider(
-        modifier = Modifier.fillMaxWidth(), color = Color.Gray, thickness = 1.dp
-    )
+
+                Text(
+                    text = note.title,
+                    style = MaterialTheme.typography.titleSmall,
+                    fontSize = 16.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                Text(
+                    text = note.content,
+                    style = MaterialTheme.typography.bodyMedium,
+                    maxLines = when (layoutMode) {
+                        LayoutMode.Small -> 1
+                        LayoutMode.Big -> 3
+                        else -> 0
+                    },
+                    overflow = TextOverflow.Ellipsis
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        if (note.locked) {
+                            Icon(
+                                imageVector = Icons.Default.Lock,
+                                contentDescription = "Locked",
+                                tint = Color.Gray,
+                                modifier = Modifier
+                                    .size(12.dp)
+                            )
+                            Spacer(Modifier.width(8.dp))
+
+                        }
+
+
+                        // Display folder name (You can style this as needed)
+                        Text(
+                            text = "#${(note.folderId ?: "Undefined")}", // Replace with your folder retrieval logic
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color.Gray,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+
+                    Text(
+                        text = formatUpdatedAt(note.updatedAt),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.Gray, // You can change the color
+                    )
+                }
+            }
+        }
+
+        Divider(
+            modifier = Modifier.fillMaxWidth(), color = Color.LightGray, thickness = 1.dp
+        )
+    }
 }
+
 
 @Composable
 fun CardNoteItem(note: Note, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() },
+            .clickable { onClick() }
+            .height(256.dp),
         shape = RoundedCornerShape(8.dp),
     ) {
         Column(
             modifier = Modifier
-                .padding(16.dp)
                 .fillMaxWidth()
+                .padding(16.dp)
         ) {
-            Text(text = note.title.takeUnless { it.isBlank() } ?: "(No title)",
-                style = TextStyle(fontWeight = FontWeight.Bold),
-                fontSize = 18.sp,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis)
-            Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = note.content,
-                style = TextStyle(fontWeight = FontWeight.Normal),
+                text = note.title,
+                style = MaterialTheme.typography.titleSmall,
                 fontSize = 16.sp,
-                maxLines = 3,
+                maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
+            Text(
+                text = note.content,
+                style = MaterialTheme.typography.bodyMedium,
+                maxLines = 8,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (note.locked) {
+                        Icon(
+                            imageVector = Icons.Default.Lock,
+                            contentDescription = "Locked",
+                            tint = Color.Gray,
+                            modifier = Modifier
+                                .size(12.dp)
+                        )
+                        Spacer (Modifier.width(8.dp))
+                    }
+                    // Display folder name (You can style this as needed)
+                    Text(
+                        text = "#${(note.folderId ?: "Undefined")}", // Replace with your folder retrieval logic
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.Gray,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+
+
+                Text(
+                    text = formatUpdatedAt(note.updatedAt),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.Gray, // You can change the color
+                )
+            }
         }
     }
 }
