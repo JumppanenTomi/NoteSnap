@@ -62,6 +62,9 @@ dependencies {
     val languageDetectionVersion = "17.0.4"
 
 
+    // material-icon
+    implementation("androidx.compose.material:material-icons-extended:1.5.3")
+
     //ml kit vision
     implementation("com.google.mlkit:vision-common:17.3.0")
 
