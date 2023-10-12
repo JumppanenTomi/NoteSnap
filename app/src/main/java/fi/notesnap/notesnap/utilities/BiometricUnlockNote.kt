@@ -5,14 +5,26 @@ import android.util.Log
 import android.widget.Toast
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.CancellableContinuation
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
 import java.util.concurrent.Executor
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class BiometricUnlockNote(context: Context, fragment: FragmentActivity) {
     private var executor: Executor
     private var biometricPrompt: BiometricPrompt
     private var promptInfo: BiometricPrompt.PromptInfo
+
+    private var authenticationSucceeded: Boolean  = false
+
     init {
         executor = ContextCompat.getMainExecutor(context)
         biometricPrompt = BiometricPrompt(fragment, executor,
@@ -27,6 +39,7 @@ class BiometricUnlockNote(context: Context, fragment: FragmentActivity) {
                         "Authentication error: $errString", Toast.LENGTH_SHORT
                     )
                         .show()
+                    authenticationSucceeded = false
                 }
 
                 override fun onAuthenticationSucceeded(
@@ -38,6 +51,7 @@ class BiometricUnlockNote(context: Context, fragment: FragmentActivity) {
                         "Authentication succeeded!", Toast.LENGTH_SHORT
                     )
                         .show()
+                    authenticationSucceeded = true
                 }
 
                 override fun onAuthenticationFailed() {
@@ -47,6 +61,7 @@ class BiometricUnlockNote(context: Context, fragment: FragmentActivity) {
                         Toast.LENGTH_SHORT
                     )
                         .show()
+                    authenticationSucceeded = false
                 }
             })
         promptInfo = BiometricPrompt.PromptInfo.Builder()
@@ -55,22 +70,27 @@ class BiometricUnlockNote(context: Context, fragment: FragmentActivity) {
             .setNegativeButtonText("Use account password")
             .build()
     }
-     fun checkDeviceHasBiometric(context: Context){
+
+    fun checkDeviceHasBiometric(context: Context) {
         val biometricManager = BiometricManager.from(context)
-        when (biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL)){
-            BiometricManager.BIOMETRIC_SUCCESS ->{
+        when (biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL)) {
+            BiometricManager.BIOMETRIC_SUCCESS -> {
                 Log.d("BIOMETRIC", "App can authenticate using biometric")
             }
-            BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE->{
+
+            BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE -> {
                 Log.d("BIOMETRIC", "No Hardware")
             }
-            BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE->{
+
+            BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE -> {
                 Log.d("BIOMETRIC", "Biometrics is currently unavailable")
             }
-            BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED->{
+
+            BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> {
                 Log.d("BIOMETRIC", "Device does not enable biometric feature")
             }
-            else ->{
+
+            else -> {
                 Log.d("BIOMETRIC", "Something went wrong")
             }
 
@@ -79,5 +99,24 @@ class BiometricUnlockNote(context: Context, fragment: FragmentActivity) {
 
     fun authenticate(){
         biometricPrompt.authenticate(promptInfo)
+
+        // Wait for the authentication result and then update showNoteDetails
+        biometricPrompt.addAuthenticationCallback(object : BiometricPrompt.AuthenticationCallback() {
+            override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                super.onAuthenticationSucceeded(result)
+                // Authentication succeeded
+                showNoteDetails = true
+            }
+
+            override fun onAuthenticationFailed() {
+                super.onAuthenticationFailed()
+                // Authentication failed
+                showNoteDetails = false
+            }
+        })
+    }
+    fun hasAuthenticationSucceeded(): Boolean {
+        Log.d("AUTH",authenticationSucceeded.toString())
+        return authenticationSucceeded
     }
 }

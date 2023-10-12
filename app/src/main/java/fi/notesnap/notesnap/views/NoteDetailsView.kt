@@ -57,8 +57,6 @@ fun NoteDetailsView(note: Note, viewModel: NoteViewModelV2, toggleNoteDetails: (
     var isDialogVisible = remember { mutableStateOf(false) }
     val listOfFolders by viewModel.getAllFolders().observeAsState(initial = emptyList())
 
-
-
     var currentFolder by remember { mutableStateOf("Choose Folder") }
 
     var deleteEvent by remember {
@@ -124,6 +122,8 @@ fun NoteDetailsView(note: Note, viewModel: NoteViewModelV2, toggleNoteDetails: (
                     )
                     viewModel.updateNote(updatedNote)
                 }
+                toggleNoteDetails(false)
+
             },
             modifier = Modifier.fillMaxWidth()
         ) {

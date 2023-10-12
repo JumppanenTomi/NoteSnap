@@ -28,12 +28,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,21 +44,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import fi.notesnap.notesnap.FolderState
-import fi.notesnap.notesnap.daos.FolderDao
-import fi.notesnap.notesnap.elements.ListNotes
-import fi.notesnap.notesnap.entities.Folder
 import fi.notesnap.notesnap.entities.Note
+import fi.notesnap.notesnap.utilities.BiometricUnlockNote
 import fi.notesnap.notesnap.viewmodels.NoteViewModelV2
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
 
 @OptIn(ExperimentalMaterial3Api::class)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "CoroutineCreationDuringComposition")
 @Composable
-fun NoteScreen(navController: NavController, viewModel: NoteViewModelV2) {
+fun NoteScreen(navController: NavController, viewModel: NoteViewModelV2, biometricUnlockNote: BiometricUnlockNote) {
     // State to track the current layout mode (small, big, card)
     var layoutMode by remember { mutableStateOf(LayoutMode.Small) }
     // Observe notes from the view model
@@ -67,6 +61,7 @@ fun NoteScreen(navController: NavController, viewModel: NoteViewModelV2) {
     var showNoteDetails by remember { mutableStateOf(false) }
     var selectedNote by remember { mutableStateOf<Note?>(null) }
     var showLayoutOptions by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
 
     // Define the number of columns for the grid layout
     val columns = when (layoutMode) {
@@ -99,20 +94,21 @@ fun NoteScreen(navController: NavController, viewModel: NoteViewModelV2) {
         ) {
             items(notes.value) { note ->
                 when (layoutMode) {
+
                     LayoutMode.Small -> SmallNoteItem(note) {
                         selectedNote = note
-
-                        showNoteDetails = true
+                        biometricUnlockNote.authenticate()
+                        showNoteDetails = biometricUnlockNote.hasAuthenticationSucceeded()
                     }
 
                     LayoutMode.Big -> BigNoteItem(note) {
                         selectedNote = note
-                        showNoteDetails = true
+                        showNoteDetails = false
                     }
 
                     LayoutMode.Card -> CardNoteItem(note) {
                         selectedNote = note
-                        showNoteDetails = true
+                        showNoteDetails = false
                     }
                 }
             }
@@ -171,21 +167,27 @@ fun NoteScreen(navController: NavController, viewModel: NoteViewModelV2) {
     }
 
     if (showNoteDetails && selectedNote != null) {
+
         ModalBottomSheet(
             onDismissRequest = { showNoteDetails = false },
             modifier = Modifier.fillMaxSize(),
         ) {
-            fun toggleShowNoteDetails(boolean: Boolean) {
-                showNoteDetails = boolean
+
+                fun toggleShowNoteDetails(boolean: Boolean) {
+                        showNoteDetails = boolean
+                }
+
+                NoteDetailsView(
+                    selectedNote!!,
+                    viewModel = viewModel,
+                    toggleNoteDetails = ::toggleShowNoteDetails
+                )
             }
-            NoteDetailsView(
-                selectedNote!!,
-                viewModel = viewModel,
-                toggleNoteDetails = ::toggleShowNoteDetails
-            )
         }
-    }
-}
+
+        }
+
+
 
 @Composable
 fun LayoutOptionButton(

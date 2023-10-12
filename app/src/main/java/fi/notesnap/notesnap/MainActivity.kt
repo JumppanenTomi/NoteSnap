@@ -72,7 +72,8 @@ class MainActivity : FragmentActivity() {
         super.onCreate(savedInstanceState)
         var biometricUnlockNote = BiometricUnlockNote(applicationContext, this)
         biometricUnlockNote.checkDeviceHasBiometric(this)
-        biometricUnlockNote.authenticate()
+
+
         setContent {
             NoteSnapTheme {
                 val navController = rememberNavController()
@@ -126,8 +127,9 @@ class MainActivity : FragmentActivity() {
                                 composable("noteList") {
                                     toggleFloatingButton(true)
                                     NoteScreen(
-                                        navController = navController,
-                                        viewModel = noteViewModelV2
+                                        navController,
+                                        noteViewModelV2,
+                                        biometricUnlockNote
                                     )
                                 }
 
