@@ -70,9 +70,9 @@ class BiometricUnlockNote(context: Context, fragment: FragmentActivity, toggleNo
                 }
             })
         promptInfo = BiometricPrompt.PromptInfo.Builder()
-            .setTitle("Biometric login for my app")
-            .setSubtitle("Log in using your biometric credential")
-            .setNegativeButtonText("Use account password")
+            .setTitle("Biometric Lock")
+            .setSubtitle("Unlock the note using your biometric credential")
+            .setNegativeButtonText("Cancel")
             .build()
     }
 

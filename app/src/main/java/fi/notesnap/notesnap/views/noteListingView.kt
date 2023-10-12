@@ -56,6 +56,7 @@ import fi.notesnap.notesnap.data.entities.Note
 import fi.notesnap.notesnap.data.state.FolderState
 import fi.notesnap.notesnap.elements.ListNotes
 import fi.notesnap.notesnap.elements.Search
+import fi.notesnap.notesnap.utilities.BiometricUnlockNote
 import fi.notesnap.notesnap.viewmodels.NoteViewModelV2
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -131,24 +132,14 @@ fun NoteScreen(navController: NavController, viewModel: NoteViewModelV2, context
         ) {
             items(notes.value) { note ->
                 when (layoutMode) {
-                    LayoutMode.Small -> SmallNoteItem(note) {
-                        selectedNote = note
-                        if(selectedNote!!.locked){
-                            showNoteDetails = false
-                            biometricUnlockNote.authenticate()
-                        }else{
-                        showNoteDetails = true
-                        }
-                    }
-
-                    LayoutMode.Big -> BigNoteItem(note) {
+                    LayoutMode.Small, LayoutMode.Big -> ListNoteItem(note, layoutMode) {
                         selectedNote = note
                         if(selectedNote!!.locked){
                             showNoteDetails = false
                             biometricUnlockNote.authenticate()
                         }else{
                             showNoteDetails = true
-                        }                    }
+                        }                                  }
 
                     LayoutMode.Card -> CardNoteItem(note) {
                         selectedNote = note
@@ -157,7 +148,7 @@ fun NoteScreen(navController: NavController, viewModel: NoteViewModelV2, context
                             biometricUnlockNote.authenticate()
                         }else{
                             showNoteDetails = true
-                        }                    }
+                        }                                  }
                 }
             }
         }
@@ -288,13 +279,7 @@ fun FolderNoteScreen(navController: NavController, viewModel: NoteViewModelV2, f
         ) {
             items(notes.value) { note ->
                 when (layoutMode) {
-                    LayoutMode.Small -> SmallNoteItem(note) {
-                        if (selectedNote!!.locked){}
-                        selectedNote = note
-                        showNoteDetails = true
-                    }
-
-                    LayoutMode.Big -> BigNoteItem(note) {
+                    LayoutMode.Small, LayoutMode.Big -> ListNoteItem(note, layoutMode) {
                         selectedNote = note
                         showNoteDetails = true
                     }
