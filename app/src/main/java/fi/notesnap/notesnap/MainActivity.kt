@@ -37,6 +37,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import fi.notesnap.notesnap.data.viewmodels.NoteViewModelV2
 import fi.notesnap.notesnap.elements.AddFolderForm
 import fi.notesnap.notesnap.elements.AddNoteForm
 import fi.notesnap.notesnap.elements.BottomSheetNav
@@ -52,7 +53,7 @@ import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
-    private val noteViewModelV2:NoteViewModelV2 by viewModels()
+    private val noteViewModelV2: NoteViewModelV2 by viewModels()
 
     @OptIn(ExperimentalMaterial3Api::class)
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "CoroutineCreationDuringComposition")
@@ -95,6 +96,7 @@ class MainActivity : ComponentActivity() {
                     },
                     content = { innerPadding ->
                         Column(Modifier.padding(innerPadding)) {
+                            var folders by remember { mutableStateOf(listOf("General")) }
 
                             NavHost(
                                 navController,
@@ -109,6 +111,7 @@ class MainActivity : ComponentActivity() {
                                     )
                                     toggleFloatingButton(true)
                                 }
+
 
                                 composable("noteList") {
                                     toggleFloatingButton(true)

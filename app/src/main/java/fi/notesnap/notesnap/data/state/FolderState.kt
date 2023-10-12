@@ -1,6 +1,6 @@
-package fi.notesnap.notesnap
+package fi.notesnap.notesnap.data.state
 
-import fi.notesnap.notesnap.entities.Note
+import fi.notesnap.notesnap.data.entities.Note
 
 data class FolderState(
     var notes: List<Note> = emptyList(),

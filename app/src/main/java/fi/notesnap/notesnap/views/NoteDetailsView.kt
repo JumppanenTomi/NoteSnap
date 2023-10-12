@@ -33,8 +33,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import fi.notesnap.notesnap.entities.Note
-import fi.notesnap.notesnap.viewmodels.NoteViewModelV2
+import fi.notesnap.notesnap.data.entities.Note
+import fi.notesnap.notesnap.data.viewmodels.NoteViewModelV2
 
 @Composable
 fun NoteDetailsView(note: Note, viewModel: NoteViewModelV2, toggleNoteDetails: (Boolean) -> Unit) {

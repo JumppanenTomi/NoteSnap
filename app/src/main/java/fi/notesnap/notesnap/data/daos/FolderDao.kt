@@ -8,6 +8,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import fi.notesnap.notesnap.entities.Folder
+import fi.notesnap.notesnap.data.entities.Folder
 
 @Dao
 interface FolderDao {

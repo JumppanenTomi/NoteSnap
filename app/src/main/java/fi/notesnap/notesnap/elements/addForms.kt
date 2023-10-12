@@ -31,6 +31,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.runtime.livedata.observeAsState
 
 
+// Modify the AddFolderForm to accept a callback function for adding folders
 @Composable
 fun AddFolderForm(viewModel: FolderViewModel) {
     var text by remember { mutableStateOf("") }
@@ -83,6 +84,7 @@ fun FolderItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (isEditing) {
+            // Show TextField when editing
             TextField(
                 value = editingText,
                 onValueChange = { newEditingText -> editingText = newEditingText },
@@ -146,6 +148,7 @@ fun FolderList(
         if (folders.isEmpty()) {
             Text(text = "No folders added yet.")
         } else {
+            Search(folders, null, null, null)
             folders.forEachIndexed { index, folder ->
                 FolderItem(
                     folder = folder,

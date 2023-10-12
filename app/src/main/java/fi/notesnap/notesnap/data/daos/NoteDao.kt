@@ -1,4 +1,4 @@
-package fi.notesnap.notesnap.daos
+package fi.notesnap.notesnap.data.daos
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
@@ -6,7 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import fi.notesnap.notesnap.entities.Note
+import fi.notesnap.notesnap.data.entities.Note
 
 @Dao
 interface NoteDao {
