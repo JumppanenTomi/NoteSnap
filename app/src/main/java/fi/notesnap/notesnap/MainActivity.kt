@@ -54,6 +54,7 @@ import fi.notesnap.notesnap.elements.CameraCompose
 import fi.notesnap.notesnap.elements.FoldersScreen
 import fi.notesnap.notesnap.entities.Folder
 import fi.notesnap.notesnap.ui.theme.NoteSnapTheme
+import fi.notesnap.notesnap.utilities.BiometricUnlockNote
 import fi.notesnap.notesnap.viewmodels.FolderViewModel
 import fi.notesnap.notesnap.viewmodels.NoteViewModelV2
 import fi.notesnap.notesnap.views.NoteScreen
@@ -64,72 +65,14 @@ import java.util.concurrent.Executor
 class MainActivity : FragmentActivity() {
 
     private val noteViewModelV2:NoteViewModelV2 by viewModels()
-
-    private lateinit var executor: Executor
-    private lateinit var biometricPrompt: BiometricPrompt
-    private lateinit var promptInfo: BiometricPrompt.PromptInfo
-
     @OptIn(ExperimentalMaterial3Api::class)
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "CoroutineCreationDuringComposition")
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
-        executor = ContextCompat.getMainExecutor(this)
-        biometricPrompt = BiometricPrompt(this, executor,
-            object : BiometricPrompt.AuthenticationCallback() {
-                override fun onAuthenticationError(errorCode: Int,
-                                                   errString: CharSequence) {
-                    super.onAuthenticationError(errorCode, errString)
-                    Toast.makeText(applicationContext,
-                        "Authentication error: $errString", Toast.LENGTH_SHORT)
-                        .show()
-                }
-
-                override fun onAuthenticationSucceeded(
-                    result: BiometricPrompt.AuthenticationResult) {
-                    super.onAuthenticationSucceeded(result)
-                    Toast.makeText(applicationContext,
-                        "Authentication succeeded!", Toast.LENGTH_SHORT)
-                        .show()
-                }
-
-                override fun onAuthenticationFailed() {
-                    super.onAuthenticationFailed()
-                    Toast.makeText(applicationContext, "Authentication failed",
-                        Toast.LENGTH_SHORT)
-                        .show()
-                }
-            })
-        promptInfo = BiometricPrompt.PromptInfo.Builder()
-            .setTitle("Biometric login for my app")
-            .setSubtitle("Log in using your biometric credential")
-            .setNegativeButtonText("Use account password")
-            .build()
-
         super.onCreate(savedInstanceState)
-        fun checkDeviceHasBiometric(){
-            val biometricManager = BiometricManager.from(applicationContext)
-            when (biometricManager.canAuthenticate(BIOMETRIC_STRONG or DEVICE_CREDENTIAL)){
-                BiometricManager.BIOMETRIC_SUCCESS ->{
-                    Log.d("BIOMETRIC", "App can authenticate using biometric")
-                }
-                BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE->{
-                    Log.d("BIOMETRIC", "No Hardware")
-                }
-                BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE->{
-                    Log.d("BIOMETRIC", "Biometrics is currently unavailable")
-                }
-                BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED->{
-                    Log.d("BIOMETRIC", "Device does not enable biometric feature")
-                }
-                else ->{
-                    Log.d("BIOMETRIC", "Something went wrong")
-                }
-
-            }
-        }
-        checkDeviceHasBiometric()
-        biometricPrompt.authenticate(promptInfo)
+        var biometricUnlockNote = BiometricUnlockNote(applicationContext, this)
+        biometricUnlockNote.checkDeviceHasBiometric(this)
+        biometricUnlockNote.authenticate()
         setContent {
             NoteSnapTheme {
                 val navController = rememberNavController()

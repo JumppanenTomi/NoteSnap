@@ -101,6 +101,7 @@ fun NoteScreen(navController: NavController, viewModel: NoteViewModelV2) {
                 when (layoutMode) {
                     LayoutMode.Small -> SmallNoteItem(note) {
                         selectedNote = note
+
                         showNoteDetails = true
                     }
 
@@ -321,42 +322,5 @@ fun CardNoteItem(note: Note, onClick: () -> Unit) {
                 overflow = TextOverflow.Ellipsis
             )
         }
-    }
-}
-
-
-@Composable
-fun NoteListingView(
-    state: FolderState,
-    navController: NavController,
-    folderDao: FolderDao,
-) {
-    val folderCount by remember { mutableIntStateOf(0) }
-
-    LaunchedEffect(folderCount) {
-        val count = checkFolderCount(folderDao)
-        if (count == 0) {
-            createFolder(folderDao)
-        }
-    }
-
-    ListNotes(children = state.notes, navController = navController)
-}
-
-// this is temporary
-fun createFolder(dao: FolderDao) {
-    val folder = Folder(0, "Main")
-    val myCoroutineScope = CoroutineScope(Dispatchers.Default)
-    myCoroutineScope.launch {
-        dao.insertFolder(folder)
-        println("Folder created")
-    }
-}
-
-suspend fun checkFolderCount(dao: FolderDao): Int {
-    return withContext(Dispatchers.Default) {
-        val count = dao.getFolderCount()
-        println("folder count $count")
-        count
     }
 }
