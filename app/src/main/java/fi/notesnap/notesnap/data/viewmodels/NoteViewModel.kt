@@ -23,6 +23,10 @@ class NoteViewModelV2(application: Application) : AndroidViewModel(application) 
         return noteDao.getAllNotes()
     }
 
+    fun getByFolderId(folderId: Long): LiveData<List<Note>> {
+        return noteDao.getNotesByFolder(folderId)
+    }
+
     fun insertNote(title: String, content: String) {
         val currentTime = System.currentTimeMillis()
         val note = Note(0, title, content, false, null, currentTime, currentTime)
@@ -48,7 +52,6 @@ class NoteViewModelV2(application: Application) : AndroidViewModel(application) 
     fun getFolderById(id: MutableState<Long?>): LiveData<Folder> {
         return folderDao.getFolderById(state.value.folderId)
     }
-
 
     /*
     fun getNoteById(noteId: Long): LiveData<Note?> {
