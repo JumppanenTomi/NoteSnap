@@ -41,6 +41,8 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import fi.notesnap.notesnap.data.entities.Folder
 import fi.notesnap.notesnap.machineLearning.translateString
 import fi.notesnap.notesnap.utilities.languageCodeToNameMap
@@ -86,6 +88,7 @@ fun AddFolderForm(viewModel: FolderViewModel) {
 fun FolderItem(
     folder: Folder,
     viewModel: FolderViewModel,
+    navController: NavController,
     onEditCompleted: (newName: String) -> Unit,
     onDelete: () -> Unit
 ) {
@@ -95,7 +98,10 @@ fun FolderItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(16.dp)
+            .clickable {
+                navController.navigate("folderNotes/${folder.id}")
+            },
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -143,12 +149,13 @@ fun FolderItem(
 
 @Composable
 fun FoldersScreen(
-    viewModel: FolderViewModel
+    viewModel: FolderViewModel,
+    navController: NavController
 ) {
     val folders by viewModel.getAllFolders().observeAsState(emptyList())
 
     Column {
-        FolderList(folders, viewModel)
+        FolderList(folders, viewModel, navController)
     }
 }
 
@@ -156,7 +163,8 @@ fun FoldersScreen(
 @Composable
 fun FolderList(
     folders: List<Folder>,
-    viewModel: FolderViewModel
+    viewModel: FolderViewModel,
+    navController: NavController  // Add this parameter
 ) {
     Column {
         if (folders.isEmpty()) {
@@ -174,6 +182,7 @@ fun FolderList(
                     FolderItem(
                         folder = folder,
                         viewModel = viewModel,
+                        navController = navController,
                         onEditCompleted = { updatedName ->
                             // Handle the edit action here
                         },

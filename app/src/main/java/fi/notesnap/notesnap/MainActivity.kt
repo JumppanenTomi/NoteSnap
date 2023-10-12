@@ -46,6 +46,7 @@ import fi.notesnap.notesnap.elements.FoldersScreen
 import fi.notesnap.notesnap.ui.theme.NoteSnapTheme
 import fi.notesnap.notesnap.viewmodels.FolderViewModel
 import fi.notesnap.notesnap.viewmodels.NoteViewModelV2
+import fi.notesnap.notesnap.views.FolderNoteScreen
 import fi.notesnap.notesnap.views.NoteScreen
 import fi.notesnap.notesnap.views.SettingsView
 import kotlinx.coroutines.launch
@@ -99,7 +100,6 @@ class MainActivity : ComponentActivity() {
                                 .padding(innerPadding)
                                 .padding(horizontal = 8.dp, vertical = 8.dp)
                         ) {
-                            var folders by remember { mutableStateOf(listOf("General")) }
 
                             NavHost(
                                 navController,
@@ -108,11 +108,22 @@ class MainActivity : ComponentActivity() {
                                 composable("folderList") {
                                     val folderViewModel: FolderViewModel = viewModel()
 
-                                    // Removed the folders and onFoldersUpdated parameters
                                     FoldersScreen(
-                                        viewModel = folderViewModel
+                                        viewModel = folderViewModel,
+                                        navController = navController
                                     )
                                     toggleFloatingButton(true)
+                                }
+
+
+                                composable("folderNotes/{folderId}") { backStackEntry ->
+                                    val folderId = backStackEntry.arguments?.getString("folderId")?.toLongOrNull()
+                                    if (folderId != null) {
+                                        FolderNoteScreen(navController = navController, viewModel = noteViewModelV2, folderId = folderId)
+                                    } else {
+                                        // Handle error (e.g. pop back to folderList)
+                                        navController.popBackStack()
+                                    }
                                 }
 
 
