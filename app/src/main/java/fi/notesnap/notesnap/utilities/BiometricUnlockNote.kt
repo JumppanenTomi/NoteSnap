@@ -18,7 +18,7 @@ import java.util.concurrent.Executor
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-class BiometricUnlockNote(context: Context, fragment: FragmentActivity) {
+class BiometricUnlockNote(context: Context, fragment: FragmentActivity, toggleNoteDetails: (Boolean) -> Unit ) {
     private var executor: Executor
     private var biometricPrompt: BiometricPrompt
     private var promptInfo: BiometricPrompt.PromptInfo
@@ -40,6 +40,7 @@ class BiometricUnlockNote(context: Context, fragment: FragmentActivity) {
                     )
                         .show()
                     authenticationSucceeded = false
+                    toggleNoteDetails(false)
                 }
 
                 override fun onAuthenticationSucceeded(
@@ -52,6 +53,8 @@ class BiometricUnlockNote(context: Context, fragment: FragmentActivity) {
                     )
                         .show()
                     authenticationSucceeded = true
+                    toggleNoteDetails(true)
+
                 }
 
                 override fun onAuthenticationFailed() {
@@ -62,6 +65,8 @@ class BiometricUnlockNote(context: Context, fragment: FragmentActivity) {
                     )
                         .show()
                     authenticationSucceeded = false
+                    toggleNoteDetails(false)
+
                 }
             })
         promptInfo = BiometricPrompt.PromptInfo.Builder()
@@ -97,26 +102,7 @@ class BiometricUnlockNote(context: Context, fragment: FragmentActivity) {
         }
     }
 
-    fun authenticate(){
+    fun authenticate() {
         biometricPrompt.authenticate(promptInfo)
-
-        // Wait for the authentication result and then update showNoteDetails
-        biometricPrompt.addAuthenticationCallback(object : BiometricPrompt.AuthenticationCallback() {
-            override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
-                super.onAuthenticationSucceeded(result)
-                // Authentication succeeded
-                showNoteDetails = true
-            }
-
-            override fun onAuthenticationFailed() {
-                super.onAuthenticationFailed()
-                // Authentication failed
-                showNoteDetails = false
-            }
-        })
-    }
-    fun hasAuthenticationSucceeded(): Boolean {
-        Log.d("AUTH",authenticationSucceeded.toString())
-        return authenticationSucceeded
     }
 }

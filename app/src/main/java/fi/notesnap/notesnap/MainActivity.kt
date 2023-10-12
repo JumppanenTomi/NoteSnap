@@ -34,6 +34,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -44,6 +45,7 @@ import fi.notesnap.notesnap.elements.BottomSheetNav
 import fi.notesnap.notesnap.elements.CameraCompose
 import fi.notesnap.notesnap.elements.FoldersScreen
 import fi.notesnap.notesnap.ui.theme.NoteSnapTheme
+import fi.notesnap.notesnap.utilities.BiometricUnlockNote
 import fi.notesnap.notesnap.viewmodels.FolderViewModel
 import fi.notesnap.notesnap.viewmodels.NoteViewModelV2
 import fi.notesnap.notesnap.views.FolderNoteScreen
@@ -51,12 +53,13 @@ import fi.notesnap.notesnap.views.NoteScreen
 import fi.notesnap.notesnap.views.SettingsView
 import kotlinx.coroutines.launch
 
-class MainActivity : ComponentActivity() {
+class MainActivity : FragmentActivity() {
 
     private val noteViewModelV2: NoteViewModelV2 by viewModels()
 
     @OptIn(ExperimentalMaterial3Api::class)
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "CoroutineCreationDuringComposition")
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -131,7 +134,9 @@ class MainActivity : ComponentActivity() {
                                     toggleFloatingButton(true)
                                     NoteScreen(
                                         navController = navController,
-                                        viewModel = noteViewModelV2
+                                        viewModel = noteViewModelV2,
+                                        context = applicationContext,
+                                        fragmentActivity = this@MainActivity
                                     )
                                 }
 
