@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -15,6 +16,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Lock
@@ -42,7 +45,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import fi.notesnap.notesnap.entities.Note
+import fi.notesnap.notesnap.data.entities.Note
 import fi.notesnap.notesnap.viewmodels.NoteViewModelV2
 
 @SuppressLint("StateFlowValueCalledInComposition", "UnrememberedMutableState")
@@ -67,7 +70,7 @@ fun NoteDetailsView(note: Note, viewModel: NoteViewModelV2, toggleNoteDetails: (
         Dialog(
             onDismissRequest = { isDialogVisible.value = false },
             content = {
-                LazyColumn() {
+                LazyColumn {
                     items(listOfFolders) { folder ->
                         Row(
                             Modifier
@@ -103,7 +106,8 @@ fun NoteDetailsView(note: Note, viewModel: NoteViewModelV2, toggleNoteDetails: (
     Column(
         Modifier
             .padding(16.dp)
-            .fillMaxSize(), // Fill the entire screen
+            .fillMaxSize() // Fill the entire screen
+            .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.Top, // Vertically align content at the top
         horizontalAlignment = Alignment.Start
     ) {
@@ -175,6 +179,7 @@ fun NoteDetailsView(note: Note, viewModel: NoteViewModelV2, toggleNoteDetails: (
             label = { Text("Content") },
             modifier = Modifier
                 .fillMaxWidth() // Content takes up most of the space
+                .fillMaxHeight()
         )
 
         Spacer(Modifier.height(24.dp))

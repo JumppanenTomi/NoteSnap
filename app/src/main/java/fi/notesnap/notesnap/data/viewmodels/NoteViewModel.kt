@@ -5,10 +5,10 @@ import androidx.compose.runtime.MutableState
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
-import fi.notesnap.notesnap.AppDatabase
-import fi.notesnap.notesnap.NoteState
-import fi.notesnap.notesnap.entities.Folder
-import fi.notesnap.notesnap.entities.Note
+import fi.notesnap.notesnap.data.AppDatabase
+import fi.notesnap.notesnap.data.entities.Folder
+import fi.notesnap.notesnap.data.entities.Note
+import fi.notesnap.notesnap.data.state.NoteState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
@@ -21,6 +21,10 @@ class NoteViewModelV2(application: Application) : AndroidViewModel(application) 
 
     fun getAllNotes(): LiveData<List<Note>> {
         return noteDao.getAllNotes()
+    }
+
+    fun getByFolderId(folderId: Long): LiveData<List<Note>> {
+        return noteDao.getNotesByFolder(folderId)
     }
 
     fun insertNote(title: String, content: String) {
@@ -48,7 +52,6 @@ class NoteViewModelV2(application: Application) : AndroidViewModel(application) 
     fun getFolderById(id: MutableState<Long?>): LiveData<Folder> {
         return folderDao.getFolderById(state.value.folderId)
     }
-
 
     /*
     fun getNoteById(noteId: Long): LiveData<Note?> {

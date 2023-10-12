@@ -1,4 +1,4 @@
-package fi.notesnap.notesnap
+package fi.notesnap.notesnap.utilities
 
 import android.Manifest
 import android.annotation.SuppressLint

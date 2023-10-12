@@ -1,18 +1,10 @@
 package fi.notesnap.notesnap
 
 import android.annotation.SuppressLint
-import android.os.Build
 import android.os.Bundle
-import android.util.Log
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.biometric.BiometricManager
-import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
-import androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
-import androidx.biometric.BiometricPrompt
-
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
@@ -41,8 +33,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.core.content.ContextCompat
-import androidx.fragment.app.FragmentActivity
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -52,32 +43,28 @@ import fi.notesnap.notesnap.elements.AddNoteForm
 import fi.notesnap.notesnap.elements.BottomSheetNav
 import fi.notesnap.notesnap.elements.CameraCompose
 import fi.notesnap.notesnap.elements.FoldersScreen
-import fi.notesnap.notesnap.entities.Folder
 import fi.notesnap.notesnap.ui.theme.NoteSnapTheme
-import fi.notesnap.notesnap.utilities.BiometricUnlockNote
 import fi.notesnap.notesnap.viewmodels.FolderViewModel
 import fi.notesnap.notesnap.viewmodels.NoteViewModelV2
+import fi.notesnap.notesnap.views.FolderNoteScreen
 import fi.notesnap.notesnap.views.NoteScreen
 import fi.notesnap.notesnap.views.SettingsView
 import kotlinx.coroutines.launch
-import java.util.concurrent.Executor
 
-class MainActivity : FragmentActivity() {
+class MainActivity : ComponentActivity() {
 
-    private val noteViewModelV2:NoteViewModelV2 by viewModels()
+    private val noteViewModelV2: NoteViewModelV2 by viewModels()
+
     @OptIn(ExperimentalMaterial3Api::class)
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "CoroutineCreationDuringComposition")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        var biometricUnlockNote = BiometricUnlockNote(applicationContext, this)
-        biometricUnlockNote.checkDeviceHasBiometric(this)
-
 
         setContent {
             NoteSnapTheme {
                 val navController = rememberNavController()
-                var selectedItem by remember { mutableStateOf("") }
+                var selectedItem by remember { mutableStateOf("folderList") }
                 val scrollBehavior =
                     TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
                 var folders by remember { mutableStateOf(listOf<String>()) }
@@ -108,7 +95,11 @@ class MainActivity : FragmentActivity() {
                         )
                     },
                     content = { innerPadding ->
-                        Column(Modifier.padding(innerPadding)) {
+                        Column(
+                            Modifier
+                                .padding(innerPadding)
+                                .padding(horizontal = 8.dp, vertical = 8.dp)
+                        ) {
 
                             NavHost(
                                 navController,
@@ -117,19 +108,30 @@ class MainActivity : FragmentActivity() {
                                 composable("folderList") {
                                     val folderViewModel: FolderViewModel = viewModel()
 
-                                    // Removed the folders and onFoldersUpdated parameters
                                     FoldersScreen(
-                                        viewModel = folderViewModel
+                                        viewModel = folderViewModel,
+                                        navController = navController
                                     )
                                     toggleFloatingButton(true)
                                 }
 
+
+                                composable("folderNotes/{folderId}") { backStackEntry ->
+                                    val folderId = backStackEntry.arguments?.getString("folderId")?.toLongOrNull()
+                                    if (folderId != null) {
+                                        FolderNoteScreen(navController = navController, viewModel = noteViewModelV2, folderId = folderId)
+                                    } else {
+                                        // Handle error (e.g. pop back to folderList)
+                                        navController.popBackStack()
+                                    }
+                                }
+
+
                                 composable("noteList") {
                                     toggleFloatingButton(true)
                                     NoteScreen(
-                                        navController,
-                                        noteViewModelV2,
-                                        biometricUnlockNote
+                                        navController = navController,
+                                        viewModel = noteViewModelV2
                                     )
                                 }
 
@@ -210,16 +212,23 @@ class MainActivity : FragmentActivity() {
                     },
                     bottomBar = {
                         //TODO: planned icons are not yet implement in material 3 jetpack compose library so for now we use placeholders
-                        NavigationBar {
+                        NavigationBar(
+                            contentColor = MaterialTheme.colorScheme.primary,
+                        ) {
                             NavigationBarItem(
                                 icon = {
                                     Icon(
                                         Icons.Filled.Home,
-                                        contentDescription = "Folders view"
+                                        contentDescription = "Folders view",
+                                        tint = MaterialTheme.colorScheme.primary
                                     )
                                 },
-                                label = { Text("Folders") },
-                                selected = selectedItem == "folders",
+                                label = {
+                                    Text(
+                                        "Folders",
+                                    )
+                                },
+                                selected = selectedItem == "folderList",
                                 onClick = {
                                     selectedItem =
                                         "folderList"; navController.navigate("folderList")
@@ -229,11 +238,12 @@ class MainActivity : FragmentActivity() {
                                 icon = {
                                     Icon(
                                         Icons.Filled.List,
-                                        contentDescription = "Notes view"
+                                        contentDescription = "Notes view",
+                                        tint = MaterialTheme.colorScheme.primary
                                     )
                                 },
                                 label = { Text("Notes") },
-                                selected = selectedItem == "notes",
+                                selected = selectedItem == "noteList",
                                 onClick = {
                                     selectedItem =
                                         "noteList"; navController.navigate("noteList")
@@ -243,7 +253,8 @@ class MainActivity : FragmentActivity() {
                                 icon = {
                                     Icon(
                                         Icons.Filled.Settings,
-                                        contentDescription = "Settings view"
+                                        contentDescription = "Settings view",
+                                        tint = MaterialTheme.colorScheme.primary
                                     )
                                 },
                                 label = { Text("Settings") },

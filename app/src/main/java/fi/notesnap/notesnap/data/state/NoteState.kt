@@ -1,4 +1,4 @@
-package fi.notesnap.notesnap
+package fi.notesnap.notesnap.data.state
 
 data class NoteState(
     var title: String = "",

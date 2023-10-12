@@ -1,4 +1,4 @@
-package fi.notesnap.notesnap.daos
+package fi.notesnap.notesnap.data.daos
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
@@ -6,14 +6,14 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import fi.notesnap.notesnap.entities.Note
+import fi.notesnap.notesnap.data.entities.Note
 
 @Dao
 interface NoteDao {
     @Query("SELECT * FROM notes")
     fun getAllNotes(): LiveData<List<Note>>
 
-    @Query("SELECT * FROM notes WHERE FolderId = :folderId")
+    @Query("SELECT * FROM notes WHERE folderId = :folderId")
     fun getNotesByFolder(folderId: Long): LiveData<List<Note>>
 
     @Query("SELECT * FROM notes WHERE id = :noteId")

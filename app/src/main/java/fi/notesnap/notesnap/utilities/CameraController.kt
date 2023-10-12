@@ -1,3 +1,5 @@
+package fi.notesnap.notesnap.utilities
+
 import android.content.Context
 import android.util.Log.d
 import android.util.Log.e
@@ -58,7 +60,10 @@ class CameraController(
                 cameraProviderFuture.get()
                     .bindToLifecycle(owner, camSelector, preview, imageCapture)
             } catch (e: Exception) {
-                e("CameraController", "Error initializing camera: ${e.message}")
+                e(
+                    "fi.notesnap.notesnap.utilities.CameraController",
+                    "Error initializing camera: ${e.message}"
+                )
             }
         }, ContextCompat.getMainExecutor(context))
     }
@@ -72,16 +77,25 @@ class CameraController(
             ContextCompat.getMainExecutor(context),
             object : ImageCapture.OnImageCapturedCallback() {
                 override fun onError(exception: ImageCaptureException) {
-                    e("CameraController", "Error capturing image: ${exception.message}")
+                    e(
+                        "fi.notesnap.notesnap.utilities.CameraController",
+                        "Error capturing image: ${exception.message}"
+                    )
                 }
 
                 override fun onCaptureSuccess(image: ImageProxy) {
                     try {
-                        d("CameraController", "Starting text recognition")
+                        d(
+                            "fi.notesnap.notesnap.utilities.CameraController",
+                            "Starting text recognition"
+                        )
                         textRecognizer.analyze(image)
                         contextRecognizer.analyze(image)
                     } catch (e: Exception) {
-                        e("CameraController", "Error during text recognition: ${e.message}")
+                        e(
+                            "fi.notesnap.notesnap.utilities.CameraController",
+                            "Error during text recognition: ${e.message}"
+                        )
                     } finally {
                         image.close()
                     }
