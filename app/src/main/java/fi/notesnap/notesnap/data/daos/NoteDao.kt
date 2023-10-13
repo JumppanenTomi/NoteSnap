@@ -2,6 +2,7 @@ package fi.notesnap.notesnap.data.daos
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -19,8 +20,8 @@ interface NoteDao {
     @Query("SELECT * FROM notes WHERE id = :noteId")
     fun getNoteById(noteId: Long?): LiveData<Note>
 
-    @Query("DELETE FROM notes WHERE id = :noteId")
-    suspend fun deleteNoteById(noteId: Long)
+    @Delete
+    suspend fun deleteNote(note: Note)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertNote(note: Note)

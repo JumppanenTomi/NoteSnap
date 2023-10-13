@@ -42,7 +42,6 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import fi.notesnap.notesnap.data.entities.Folder
 import fi.notesnap.notesnap.machineLearning.translateString
 import fi.notesnap.notesnap.utilities.languageCodeToNameMap
