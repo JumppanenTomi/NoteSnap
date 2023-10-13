@@ -8,9 +8,15 @@ import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.label.ImageLabeling
 import com.google.mlkit.vision.label.defaults.ImageLabelerOptions
 
+/**
+ * This class detects objects from image using ML Kit
+ */
+
 class ContextRecognizer(private val onDetectedTextUpdate: (String) -> Unit) :
     ImageAnalysis.Analyzer {
-    val labeler = ImageLabeling.getClient(ImageLabelerOptions.DEFAULT_OPTIONS)
+
+    // Initialize the image labeler using default options
+    private val labeler = ImageLabeling.getClient(ImageLabelerOptions.DEFAULT_OPTIONS)
 
     @SuppressLint("UnsafeOptInUsageError")
     override fun analyze(image: ImageProxy) {
@@ -23,6 +29,7 @@ class ContextRecognizer(private val onDetectedTextUpdate: (String) -> Unit) :
                 var bestMatch = ""
                 var bestMatchConf = 0.00
 
+                // Iterate through the detected labels
                 for (label in labels) {
                     if (bestMatch == "") {
                         bestMatch = label.text
@@ -30,18 +37,22 @@ class ContextRecognizer(private val onDetectedTextUpdate: (String) -> Unit) :
                         bestMatch = label.text
                         bestMatchConf = label.confidence.toDouble()
                     }
+                    // Log the detected labels (for debugging)
                     Log.d("QQQ", label.text)
                 }
-                Log.d("QQQ", "best match was " + bestMatch)
+                // Update the detected text via the provided callback
                 onDetectedTextUpdate(bestMatch)
+                // Close the ImageProxy
                 image.close()
             }
             .addOnFailureListener { exception ->
                 // Handle image labeling failure
+                // Update the detected text as empty string and log the error
                 onDetectedTextUpdate(" ")
                 Log.e("ImageLabeling", "Image labeling failed", exception)
             }
             .addOnCompleteListener {
+                // Always close the ImageProxy, regardless of success or failure
                 image.close()
             }
     }

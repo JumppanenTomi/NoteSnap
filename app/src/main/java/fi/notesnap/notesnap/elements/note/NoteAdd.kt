@@ -1,4 +1,4 @@
-package fi.notesnap.notesnap.views
+package fi.notesnap.notesnap.elements.note
 
 import android.annotation.SuppressLint
 import android.widget.Toast
@@ -22,13 +22,11 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.LockOpen
+import androidx.compose.material.icons.filled.NoteAdd
 import androidx.compose.material.icons.filled.Translate
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
@@ -36,9 +34,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -50,25 +48,27 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.google.mlkit.nl.translate.TranslateLanguage
-import fi.notesnap.notesnap.MainViewModel
 import fi.notesnap.notesnap.data.entities.Folder
-import fi.notesnap.notesnap.data.entities.Note
-import fi.notesnap.notesnap.elements.LoadingElement
+import fi.notesnap.notesnap.data.viewmodels.MainViewModel
+import fi.notesnap.notesnap.elements.shared.LoadingElement
 import fi.notesnap.notesnap.machineLearning.translateString
 import fi.notesnap.notesnap.utilities.getLanguageName
 
 @SuppressLint("StateFlowValueCalledInComposition", "UnrememberedMutableState")
 @Composable
-fun NoteEditView(
-    note: Note, folders: List<Folder>, viewModel: MainViewModel, closeBottomSheet: () -> Unit
+fun NoteAdd(
+    titleFromCamera: String?,
+    contentFromCamera: String?,
+    viewModel: MainViewModel,
+    onCloseBottomSheet: () -> Unit
 ) {
     val context = LocalContext.current
+    val folders by viewModel.getAllFolders().observeAsState(listOf())
     val languages = TranslateLanguage.getAllLanguages()
-
-    var title by remember { mutableStateOf(note.title) }
-    var content by remember { mutableStateOf(note.content) }
-    var locked by remember { mutableStateOf(note.locked) }
-    var selectedFolder by remember { mutableStateOf(folders.find { it.id == note.folderId }) }
+    var title by remember { mutableStateOf(titleFromCamera ?: "") }
+    var content by remember { mutableStateOf(contentFromCamera ?: "") }
+    var locked by remember { mutableStateOf(false) }
+    var selectedFolder by remember { mutableStateOf<Folder?>(null) }
 
     var showLanguagesDialog by remember { mutableStateOf(false) }
     var showFoldersDialog by remember { mutableStateOf(false) }
@@ -76,8 +76,6 @@ fun NoteEditView(
     var titleReady by remember { mutableStateOf(false) }
     var contentReady by remember { mutableStateOf(false) }
     var loading by remember { mutableStateOf(false) }
-
-    var showDeleteDialog by remember { mutableStateOf(false) }
 
     if (!loading) {
         Column(
@@ -107,18 +105,13 @@ fun NoteEditView(
                             modifier = Modifier
                                 .clickable {
                                     if (title.isNotBlank()) {
-                                        val updatedNote = note.copy(
-                                            title = title,
-                                            content = content,
-                                            locked = locked,
-                                            folderId = selectedFolder?.id,
-                                            updatedAt = System.currentTimeMillis()
+                                        viewModel.insertNote(
+                                            title, content, locked, selectedFolder?.id
                                         )
-                                        viewModel.updateNote(updatedNote)
-                                        closeBottomSheet()
+                                        onCloseBottomSheet()
                                         Toast
                                             .makeText(
-                                                context, "Edited successfully", Toast.LENGTH_SHORT
+                                                context, "Added successfully", Toast.LENGTH_SHORT
                                             )
                                             .show()
                                     } else {
@@ -134,11 +127,11 @@ fun NoteEditView(
 
                         Spacer(modifier = Modifier.width(16.dp))
 
-                        Icon(imageVector = Icons.Default.Delete,
-                            contentDescription = "Delete Note",
+                        Icon(imageVector = Icons.Default.Translate,
+                            contentDescription = "Translate note",
                             modifier = Modifier
                                 .clickable {
-                                    showDeleteDialog = true
+                                    showLanguagesDialog = true
                                 }
                                 .padding(8.dp),
                             tint = MaterialTheme.colorScheme.primary)
@@ -149,17 +142,6 @@ fun NoteEditView(
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-
-                        Icon(imageVector = Icons.Default.Translate,
-                            contentDescription = "Translate note",
-                            modifier = Modifier
-                                .clickable {
-                                    showLanguagesDialog = true
-                                }
-                                .padding(8.dp),
-                            tint = MaterialTheme.colorScheme.primary)
-
-                        Spacer(modifier = Modifier.width(16.dp))
 
                         Icon(imageVector = Icons.Default.Folder,
                             contentDescription = "Folder Icon",
@@ -185,15 +167,15 @@ fun NoteEditView(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
-                    imageVector = Icons.Default.EditNote,
-                    contentDescription = "Note edit icon",
+                    imageVector = Icons.Default.NoteAdd,
+                    contentDescription = "Note add icon",
                     tint = Color.Gray,
                     modifier = Modifier.size(16.dp)
                 )
                 Spacer(Modifier.width(8.dp))
 
                 Text(
-                    text = "Edit your note",
+                    text = "Add new note",
                     style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
                     color = Color.Gray
                 )
@@ -360,7 +342,7 @@ fun NoteEditView(
                                         if (title.isNotEmpty()) {
                                             showLanguagesDialog = false
                                             content.let {
-                                                language.let { it1 ->
+                                                language?.let { it1 ->
                                                     translateString(
                                                         it1, it, ::onContentChange
                                                     )
@@ -368,7 +350,7 @@ fun NoteEditView(
                                                 loading = true
                                             }
                                             title.let {
-                                                language.let { it1 ->
+                                                language?.let { it1 ->
                                                     translateString(
                                                         it1, it, ::onTitleChange
                                                     )
@@ -398,38 +380,5 @@ fun NoteEditView(
                 }
             }
         }
-    }
-
-
-    if (showDeleteDialog) {
-        AlertDialog(icon = {
-            Icon(Icons.Default.Delete, contentDescription = "Delete icon")
-        }, title = {
-            Text(text = "Confirmation")
-        }, text = {
-            Text(text = "Are you sure you want to delete this note?")
-        }, onDismissRequest = {
-            showDeleteDialog = false
-        }, confirmButton = {
-            TextButton(onClick = {
-                viewModel.deleteNote(note)
-                showDeleteDialog = false
-                closeBottomSheet()
-                Toast
-                    .makeText(
-                        context, "Deleted successfully", Toast.LENGTH_SHORT
-                    )
-                    .show()
-
-            }) {
-                Text("Delete")
-            }
-        }, dismissButton = {
-            TextButton(onClick = {
-                showDeleteDialog = false
-            }) {
-                Text("Cancel")
-            }
-        })
     }
 }

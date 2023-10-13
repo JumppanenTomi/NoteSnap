@@ -1,4 +1,4 @@
-package fi.notesnap.notesnap.views
+package fi.notesnap.notesnap.elements.folder
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
@@ -32,11 +32,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import fi.notesnap.notesnap.MainViewModel
+import fi.notesnap.notesnap.data.viewmodels.MainViewModel
 
 @SuppressLint("StateFlowValueCalledInComposition", "UnrememberedMutableState")
 @Composable
-fun FolderAddView(viewModel: MainViewModel) {
+fun FolderAdd(viewModel: MainViewModel) {
     var name by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
 

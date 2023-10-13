@@ -1,8 +1,7 @@
-package fi.notesnap.notesnap.elements
+package fi.notesnap.notesnap.elements.shared
 
 import android.content.Context
 import android.content.pm.PackageManager
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.view.PreviewView
@@ -32,6 +31,10 @@ import androidx.lifecycle.LifecycleOwner
 import fi.notesnap.notesnap.utilities.CameraController
 import fi.notesnap.notesnap.utilities.CameraUtilities.REQUIRED_PERMISSIONS
 
+/**
+ * This is Composable that is used when ever we need to extract text or object from image. It returns camera element and after capture it process it
+ */
+
 @Composable
 fun CameraCompose(
     context: Context,
@@ -42,7 +45,7 @@ fun CameraCompose(
     var cameraController = CameraController(context, onDetectedTitleUpdate, onDetectedContentUpdate)
     var loading by remember { mutableStateOf(false) }
 
-    //TODO: Move permission check to CameraUtilities
+    //checking if app has permission to use camera
     val hasCamPermission = remember {
         mutableStateOf(
             REQUIRED_PERMISSIONS.all {
@@ -51,6 +54,7 @@ fun CameraCompose(
         )
     }
 
+    //If there was no permission we ask it
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions(),
         onResult = { permissions ->
@@ -64,9 +68,9 @@ fun CameraCompose(
         }
     }
 
+    //If we are not already processing image we show camera view
     if (!loading) {
         Column(modifier = Modifier.fillMaxSize()) {
-            Log.d("DEBUG", "start preview")
             if (hasCamPermission.value) {
                 var previewView by remember { mutableStateOf(PreviewView(context)) }
 
@@ -100,18 +104,16 @@ fun CameraCompose(
                     .clickable {
                         if (hasCamPermission.value) {
                             loading = true
-                            Log.d("DEBUG", "Camera has permission")
                             cameraController.capturePhoto(context)
-                        } else {
-                            Log.d("DEBUG", "No camera permission")
-                            //TODO: add snackbar aka Toast here.
                         }
                     }
                     .clip(CircleShape)
-                    .background(Color.Red), // Change the background color as needed
+                    .background(Color.Red),
             )
         }
-    } else {
+    }
+    //otherwise we show loading screen
+    else {
         LoadingElement(loadingText = "Processing image")
     }
 }

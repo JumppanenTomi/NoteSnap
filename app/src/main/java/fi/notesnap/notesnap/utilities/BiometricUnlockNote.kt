@@ -5,29 +5,25 @@ import android.util.Log
 import android.widget.Toast
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.viewmodel.compose.viewModel
-import kotlinx.coroutines.CancellableContinuation
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.withContext
 import java.util.concurrent.Executor
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
-class BiometricUnlockNote(context: Context, fragment: FragmentActivity, toggleNoteDetails: (Boolean) -> Unit ) {
+class BiometricUnlockNote(
+    context: Context,
+    fragment: FragmentActivity,
+    toggleNoteDetails: (Boolean) -> Unit
+) {
     private var executor: Executor
     private var biometricPrompt: BiometricPrompt
     private var promptInfo: BiometricPrompt.PromptInfo
 
-    private var authenticationSucceeded: Boolean  = false
+    private var authenticationSucceeded: Boolean = false
 
     init {
         executor = ContextCompat.getMainExecutor(context)
-        biometricPrompt = BiometricPrompt(fragment, executor,
+        biometricPrompt = BiometricPrompt(
+            fragment, executor,
             object : BiometricPrompt.AuthenticationCallback() {
                 override fun onAuthenticationError(
                     errorCode: Int,

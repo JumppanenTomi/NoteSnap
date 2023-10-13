@@ -1,5 +1,7 @@
 package fi.notesnap.notesnap.utilities
 
+//This file just has one variable that holds map of language-codes and their full names.
+
 val languageCodeToNameMap = mapOf(
     "af" to "Afrikaans",
     "sq" to "Albanian",
