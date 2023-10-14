@@ -1,6 +1,7 @@
 package fi.notesnap.notesnap.elements.folder
 
 import android.annotation.SuppressLint
+import android.content.Context
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -30,6 +31,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.fragment.app.FragmentActivity
 import fi.notesnap.notesnap.data.entities.Note
 import fi.notesnap.notesnap.data.viewmodels.MainViewModel
 import fi.notesnap.notesnap.elements.note.CardNoteItem
@@ -38,12 +40,15 @@ import fi.notesnap.notesnap.elements.note.LayoutOptionButton
 import fi.notesnap.notesnap.elements.note.ListNoteItem
 import fi.notesnap.notesnap.elements.note.NoteEdit
 import fi.notesnap.notesnap.elements.shared.Search
+import fi.notesnap.notesnap.utilities.BiometricUnlockNote
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun FolderNoteScreen(viewModel: MainViewModel, folderId: Long) {
+fun FolderNoteScreen(viewModel: MainViewModel, folderId: Long, context: Context,
+                     fragmentActivity: FragmentActivity
+) {
     // State to track the current layout mode (small, big, card)
     var layoutMode by remember { mutableStateOf(LayoutMode.Small) }
     val folders by viewModel.getAllFolders().observeAsState(listOf())
@@ -53,6 +58,8 @@ fun FolderNoteScreen(viewModel: MainViewModel, folderId: Long) {
     var selectedNote by remember { mutableStateOf<Note?>(null) }
     var showLayoutOptions by remember { mutableStateOf(false) }
 
+
+
     fun setSelectedNote(note: Note) {
         selectedNote = note
     }
@@ -60,6 +67,9 @@ fun FolderNoteScreen(viewModel: MainViewModel, folderId: Long) {
     fun setShowNote(boolean: Boolean) {
         showNoteDetails = boolean
     }
+
+    val biometricUnlockNote =
+        BiometricUnlockNote(context, fragmentActivity, ::setShowNote)
 
     // Define the number of columns for the grid layout
     val columns = when (layoutMode) {
@@ -102,12 +112,22 @@ fun FolderNoteScreen(viewModel: MainViewModel, folderId: Long) {
                 when (layoutMode) {
                     LayoutMode.Small, LayoutMode.Big -> ListNoteItem(note, layoutMode, folders) {
                         selectedNote = note
-                        showNoteDetails = true
+                        if (selectedNote!!.locked) {
+                            showNoteDetails = false
+                            biometricUnlockNote.authenticate()
+                        } else {
+                            showNoteDetails = true
+                        }
                     }
 
                     LayoutMode.Card -> CardNoteItem(note, folders) {
                         selectedNote = note
-                        showNoteDetails = true
+                        if (selectedNote!!.locked) {
+                            showNoteDetails = false
+                            biometricUnlockNote.authenticate()
+                        } else {
+                            showNoteDetails = true
+                        }
                     }
                 }
             }

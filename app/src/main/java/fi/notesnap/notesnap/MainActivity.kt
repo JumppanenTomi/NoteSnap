@@ -119,7 +119,9 @@ class MainActivity : FragmentActivity() {
                                     if (folderId != null) {
                                         FolderNoteScreen(
                                             viewModel = viewModel,
-                                            folderId = folderId
+                                            folderId = folderId,
+                                            context = applicationContext,
+                                            fragmentActivity = this@MainActivity
                                         )
                                     } else {
                                         navController.popBackStack()
