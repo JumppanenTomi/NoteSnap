@@ -28,7 +28,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fi.notesnap.notesnap.data.entities.Folder
 import fi.notesnap.notesnap.data.entities.Note
-import fi.notesnap.notesnap.utilities.formatUpdatedAt
+import fi.notesnap.notesnap.data.viewmodels.LayoutMode
+import fi.notesnap.notesnap.utilities.formatTimeAgo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -99,7 +100,7 @@ fun ListNoteItem(note: Note, layoutMode: LayoutMode, folders: List<Folder>, onCl
                     }
 
                     Text(
-                        text = formatUpdatedAt(note.updatedAt),
+                        text = formatTimeAgo(note.updatedAt),
                         style = MaterialTheme.typography.bodySmall,
                         color = Color.Gray, // You can change the color
                     )

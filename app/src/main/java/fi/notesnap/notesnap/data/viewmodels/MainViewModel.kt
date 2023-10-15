@@ -15,11 +15,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val folderDao = database.folderDao()
 
     fun getAllNotes(folder: Folder?): LiveData<List<Note>> {
-        return if (folder == null) noteDao.getAllNotes() else noteDao.getNotesByFolder(folder.id)
+        return noteDao.getAllNotesTest()
     }
 
     fun getByFolderId(folderId: Long): LiveData<List<Note>> {
-        return noteDao.getNotesByFolder(folderId)
+        return noteDao.getAllNotesTest()
     }
 
     fun insertNote(title: String, content: String, locked: Boolean, folderId: Long?) {

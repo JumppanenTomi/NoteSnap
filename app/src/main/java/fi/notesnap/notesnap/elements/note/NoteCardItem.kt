@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fi.notesnap.notesnap.data.entities.Folder
 import fi.notesnap.notesnap.data.entities.Note
-import fi.notesnap.notesnap.utilities.formatUpdatedAt
+import fi.notesnap.notesnap.utilities.formatTimeAgo
 
 @Composable
 fun CardNoteItem(note: Note, folders: List<Folder>, onClick: () -> Unit) {
@@ -88,7 +88,7 @@ fun CardNoteItem(note: Note, folders: List<Folder>, onClick: () -> Unit) {
 
 
                 Text(
-                    text = formatUpdatedAt(note.updatedAt),
+                    text = formatTimeAgo(note.updatedAt),
                     style = MaterialTheme.typography.bodySmall,
                     color = Color.Gray, // You can change the color
                 )
