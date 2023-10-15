@@ -1,4 +1,4 @@
-package fi.notesnap.notesnap.elements
+package fi.notesnap.notesnap.elements.shared
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +19,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+
+/**
+ * This is Composable that is used in main bottom sheet to navigate between "add folder" and "add note"
+ */
 
 @Composable
 fun BottomSheetNav(navController: NavController) {

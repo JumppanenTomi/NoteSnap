@@ -1,4 +1,4 @@
-package fi.notesnap.notesnap
+package fi.notesnap.notesnap.data.viewmodels
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -43,12 +43,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun insertFolder(name: String, description: String) {
-        val currentTime = System.currentTimeMillis()
         val folder = Folder(0, name)
         viewModelScope.launch { folderDao.insertFolder(folder) }
-    }
-
-    fun deleteFolder(folder: Folder) {
-        viewModelScope.launch { folderDao.deleteFolder(folder) }
     }
 }

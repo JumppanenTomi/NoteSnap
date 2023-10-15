@@ -1,4 +1,4 @@
-package fi.notesnap.notesnap.elements
+package fi.notesnap.notesnap.elements.shared
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,6 +22,11 @@ import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.unit.dp
 import fi.notesnap.notesnap.data.entities.Folder
 import fi.notesnap.notesnap.data.entities.Note
+
+/**
+ * This fucntion returns composable search field that is capable to show and filter either Note list or Folder list
+ */
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

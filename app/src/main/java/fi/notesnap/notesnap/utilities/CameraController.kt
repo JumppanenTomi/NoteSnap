@@ -22,10 +22,13 @@ class CameraController(
     onDetectedTitleUpdate: (String) -> Unit,
     onDetectedContentUpdate: (String) -> Unit,
 ) {
+    // Initialize the ImageCapture variable
     private var imageCapture: ImageCapture? = null
 
+    // Initialize the camera provider future
     private val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
 
+    // Initialize the text recognizer and context recognizer
     private val textRecognizer =
         TextRecognizer(
             onDetectedTextUpdate = onDetectedContentUpdate
@@ -35,6 +38,7 @@ class CameraController(
             onDetectedTextUpdate = onDetectedTitleUpdate
         )
 
+    // Function to start the camera preview view
     fun startPreviewView(
         previewView: PreviewView,
         updatePreviewView: (PreviewView) -> Unit,
@@ -42,15 +46,18 @@ class CameraController(
         owner: LifecycleOwner,
     ) {
         cameraProviderFuture.addListener({
+            // Create and configure the preview
             val preview =
                 Preview.Builder().setTargetAspectRatio(AspectRatio.RATIO_16_9).build().also {
                     it.setSurfaceProvider(previewView.surfaceProvider)
                 }
 
+            // Create and configure the ImageCapture
             imageCapture =
                 ImageCapture.Builder().setTargetAspectRatio(AspectRatio.RATIO_16_9)
                     .setCaptureMode(CAPTURE_MODE_MAXIMIZE_QUALITY).build()
 
+            // Create the camera selector
             val camSelector =
                 CameraSelector.Builder().requireLensFacing(CameraSelector.LENS_FACING_BACK).build()
 
@@ -60,6 +67,7 @@ class CameraController(
                 cameraProviderFuture.get()
                     .bindToLifecycle(owner, camSelector, preview, imageCapture)
             } catch (e: Exception) {
+                // Handle errors related to camera initialization
                 e(
                     "fi.notesnap.notesnap.utilities.CameraController",
                     "Error initializing camera: ${e.message}"
@@ -68,6 +76,7 @@ class CameraController(
         }, ContextCompat.getMainExecutor(context))
     }
 
+    // Function to capture a photo and perform text recognition
     fun capturePhoto(
         context: Context,
     ) {
@@ -77,6 +86,7 @@ class CameraController(
             ContextCompat.getMainExecutor(context),
             object : ImageCapture.OnImageCapturedCallback() {
                 override fun onError(exception: ImageCaptureException) {
+                    // Handle errors related to image capture
                     e(
                         "fi.notesnap.notesnap.utilities.CameraController",
                         "Error capturing image: ${exception.message}"
@@ -89,14 +99,17 @@ class CameraController(
                             "fi.notesnap.notesnap.utilities.CameraController",
                             "Starting text recognition"
                         )
+                        // Analyze the captured image using text and context recognizers
                         textRecognizer.analyze(image)
                         contextRecognizer.analyze(image)
                     } catch (e: Exception) {
+                        // Handle errors related to text recognition
                         e(
                             "fi.notesnap.notesnap.utilities.CameraController",
                             "Error during text recognition: ${e.message}"
                         )
                     } finally {
+                        // Always close the ImageProxy
                         image.close()
                     }
                 }

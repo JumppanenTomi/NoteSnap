@@ -1,4 +1,4 @@
-package fi.notesnap.notesnap.elements
+package fi.notesnap.notesnap.elements.shared
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,6 +13,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+
+
+/**
+ * This function returns loading screen with desired text
+ */
 
 @Composable
 fun LoadingElement(loadingText: String) {

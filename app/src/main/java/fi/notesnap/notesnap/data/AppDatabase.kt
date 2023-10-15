@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import fi.notesnap.notesnap.daos.FolderDao
+import fi.notesnap.notesnap.data.daos.FolderDao
 import fi.notesnap.notesnap.data.daos.NoteDao
 import fi.notesnap.notesnap.data.entities.Folder
 import fi.notesnap.notesnap.data.entities.Note

@@ -2,12 +2,11 @@ package fi.notesnap.notesnap.utilities
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Context
-import android.content.pm.PackageManager
 import android.os.Build
-import androidx.core.content.ContextCompat
 
 object CameraUtilities {
+
+    //used to ask user for permission to use camera
     @SuppressLint("ObsoleteSdkInt")
     val REQUIRED_PERMISSIONS =
         mutableListOf(
@@ -17,10 +16,4 @@ object CameraUtilities {
                 add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
             }
         }.toTypedArray()
-
-    fun allPermissionsGranted(ctx: Context) =
-        REQUIRED_PERMISSIONS.all {
-            ContextCompat.checkSelfPermission(ctx, it) ==
-                    PackageManager.PERMISSION_GRANTED
-        }
 }

@@ -1,4 +1,4 @@
-package fi.notesnap.notesnap.daos
+package fi.notesnap.notesnap.data.daos
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
