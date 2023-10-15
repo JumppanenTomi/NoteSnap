@@ -22,3 +22,6 @@
 |WorkManager/Worker (e.g. with boot intent)|no|
 |NFC|no|
 |Other APIs (map, graph,...) or more JetPack librairies (e.g. Navigation, CameraX, etc.)|yes|
+
+## Manual
+To run the app, open it in Android studio, **File-> Sync Project with Gradle Files**, then **Make Project**, and finally **Run 'app'**
