@@ -3,7 +3,7 @@
 ### Grade 1-3
 |Description|Implemented (yes/no/partially)|
 | --- | ----------- |
-|Phone’s internal sensor(s)|no|
+|Phone’s internal sensor(s)|fingerprint sensor|
 |Follow material design guidelines recommendation|yes|
 |Accessibility checked (contrast, label,...)|yes|
 |Use at least 2 out of 4 basic components (activity, broadcast receiver, service, content provider)|1 (Activity)|
