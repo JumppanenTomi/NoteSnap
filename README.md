@@ -1,27 +1,13 @@
-# NoteSnap
-## Grading
-### Grade 1-3
-|Description|Implemented (yes/no/partially)|
-| --- | ----------- |
-|Phone’s internal sensor(s)|fingerprint sensor|
-|Follow material design guidelines recommendation|yes|
-|Accessibility checked (contrast, label,...)|yes|
-|Use at least 2 out of 4 basic components (activity, broadcast receiver, service, content provider)|1 (Activity)|
-|Compose|yes|
-|Persistence (Room and/or File and/or SharedPreferences)|yes|
-|Clean code (private, val, small meaningful methods, correct indent, no lint warnings, packages, good naming,...)|yes|
-### Grade 4-5 - All requirements from grade 1-3 and (some of)
-|Description|Implemented (yes/no/partially)|
-| --- | ----------- |
-|3 out of 4 basic components|no|
-|Connection to some web service|Translation using ML kit|
-|Have AR related/AI functionality|yes using ML kit|
-|External sensor(s) and BT-communication|no|
-|Extra "hardware" on addition to sensors (gps, mic, camera,...)|yes camera|
-|ViewModel, LiveData|yes|
-|WorkManager/Worker (e.g. with boot intent)|no|
-|NFC|no|
-|Other APIs (map, graph,...) or more JetPack librairies (e.g. Navigation, CameraX, etc.)|yes|
+# About NoteSnap
+NoteSnap is an advanced note application that not only incorporates fundamental note-taking features but also offers additional functionalities such as language translation, folder organization, and integration with Google's ML Kit API for extracting text from images (currently supporting printed text only). The application is developed using Jetpack Compose and features a sleek Material 3 UI design.
 
-## Manual
-To run the app, open it in Android studio, **File-> Sync Project with Gradle Files**, then **Make Project**, and finally **Run 'app'**
+# Installation
+## Ensure Allowance for Installation from External Sources on Android
+Before proceeding with the installation, ensure that your Android device is configured to permit installations from sources other than the Google Play store. Follow the steps outlined in [this guide](https://support.google.com/files/thread/168027650?hl=en&msgid=168042310) to enable your preferred browser, such as Google Chrome, to download Android apps from unknown sources.
+
+## Download and Install the .apk File
+1. Visit the releases page.
+2. Download the latest .apk file available.
+3. Install the downloaded .apk file on your device.
+
+After completing these steps, the NoteSnap application will be successfully installed on your device, and you can begin using it for medication reminders.
