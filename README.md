@@ -10,4 +10,4 @@ Before proceeding with the installation, ensure that your Android device is conf
 2. Download the latest .apk file available.
 3. Install the downloaded .apk file on your device.
 
-After completing these steps, the NoteSnap application will be successfully installed on your device, and you can begin using it for medication reminders.
+After completing these steps, the NoteSnap application will be successfully installed on your device.
